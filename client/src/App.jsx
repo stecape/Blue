@@ -28,7 +28,7 @@ function App () {
         <Route path="tags" element={<Tags/>} />
         <Route path="controls" element={<Controls/>} />
         <Route path="trend" element={<Trend/>} />
-        <Route path="/oven" element={<Oven />} />
+        <Route path="oven" element={<Oven />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </NestedDialogContextProvider>

@@ -5,10 +5,44 @@ import backend_api from './src/api/backend_api.js'
 import db_api from './src/api/db_api.js'
 import mqtt_api from './src/api/mqtt_api.js'
 import controls_api from './src/api/controls_api.js'
+import auth_api from './src/api/auth_api.js'
+import session from 'express-session'
+import passport from './src/auth/passport-config.js'
+import { configurePassport } from './src/auth/passport-config.js'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const startApp = () => {
   //initialize the WebSocket server and the express app
   const {connection, expressApp} = app_ws()
+  
+  // Trust proxy - necessario quando si è dietro nginx
+  expressApp.set('trust proxy', 1)
+  
+  // Configurazione sessioni
+  expressApp.use(
+    session({
+      secret: process.env.SESSION_SECRET || 'your-secret-key',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        secure: process.env.NODE_ENV === 'production', // true solo in produzione con HTTPS
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24, // 24 ore
+        sameSite: 'lax' // Importante per OAuth
+      }
+    })
+  )
+
+  // Inizializzazione Passport
+  configurePassport()
+  expressApp.use(passport.initialize())
+  expressApp.use(passport.session())
+
+  // API di autenticazione
+  auth_api(expressApp)
+
   //initialize the WebSocket message broker, that collects the messages from the globalEventEmitter (backend internal emitter) and sends them to the clients that are destinated to the WebSocket
   app_wsMessageBroker(connection)
 

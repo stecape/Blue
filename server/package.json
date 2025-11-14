@@ -5,12 +5,17 @@
   "type": "module",
   "scripts": {
     "start": "node ./index.js",
-    "watch": "nodemon"
+    "watch": "nodemon",
+    "generate-secret": "node generate-secret.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "~4.16.1",
+    "express-session": "^1.18.2",
     "mqtt": "^5.10.2",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.25.6",
