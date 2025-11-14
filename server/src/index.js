@@ -1,14 +1,12 @@
-import app_ws from './src/App/app_ws.js'
-import { db_manager } from './src/DB/db_manager.js'
-import app_wsMessageBroker from './src/App/app_wsMessageBroker.js'
-import backend_api from './src/api/backend_api.js'
-import db_api from './src/api/db_api.js'
-import mqtt_api from './src/api/mqtt_api.js'
-import controls_api from './src/api/controls_api.js'
-import auth_api from './src/api/auth_api.js'
+import app_ws from './App/app_ws.js'
+import { db_manager } from './DB/db_manager.js'
+import app_wsMessageBroker from './App/app_wsMessageBroker.js'
+import backend_api from './api/backend_api.js'
+import db_api from './api/db_api.js'
+import mqtt_api from './api/mqtt_api.js'
+import controls_api from './api/controls_api.js'
+import auth_api from './api/auth_api.js'
 import session from 'express-session'
-import passport from './src/auth/passport-config.js'
-import { configurePassport } from './src/auth/passport-config.js'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -35,14 +33,6 @@ const startApp = () => {
     })
   )
 
-  // Inizializzazione Passport
-  configurePassport()
-  expressApp.use(passport.initialize())
-  expressApp.use(passport.session())
-
-  // API di autenticazione
-  auth_api(expressApp)
-
   //initialize the WebSocket message broker, that collects the messages from the globalEventEmitter (backend internal emitter) and sends them to the clients that are destinated to the WebSocket
   app_wsMessageBroker(connection)
 
@@ -52,6 +42,7 @@ const startApp = () => {
   //initialize the database manager
   db_manager()
     .then((pool) => {
+      auth_api(expressApp, pool)
       db_api(expressApp, pool)
       mqtt_api(expressApp, pool)
       controls_api(expressApp, pool)

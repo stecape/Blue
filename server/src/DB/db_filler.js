@@ -2,6 +2,40 @@
 export default function (client) {
   return new Promise((innerResolve, innerReject) => {
     var queryString=`
+  
+    -- In futuro si userà ENUM('google', 'apple', 'microsoft', 'local');
+
+    DO $$ 
+    BEGIN
+      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+        CREATE TYPE user_role AS ENUM('admin', 'user');
+      END IF;
+      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'identity_provider') THEN
+        CREATE TYPE identity_provider AS ENUM('google');
+      END IF;
+    END $$;
+
+    CREATE TABLE IF NOT EXISTS public."User"
+    (
+      id SERIAL PRIMARY KEY,
+      email text COLLATE pg_catalog."default" NOT NULL,
+      name text COLLATE pg_catalog."default" NOT NULL,
+      picture VARCHAR(512),
+      role user_role NOT NULL DEFAULT 'user',
+      UNIQUE(email)
+    );
+
+
+    CREATE TABLE IF NOT EXISTS public."User_Identities"
+    (
+      id SERIAL PRIMARY KEY,
+      user_id BIGINT NOT NULL,
+      provider identity_provider NOT NULL,
+      provider_user_id VARCHAR(255),
+      password_hash VARCHAR(255)
+    );
+
+
     CREATE TABLE IF NOT EXISTS public."Field"
     (
       id SERIAL PRIMARY KEY,
@@ -36,14 +70,15 @@ export default function (client) {
       base_type bool NOT NULL,
       locked bool NOT NULL
     );
-        
+      
     CREATE TABLE IF NOT EXISTS public."Device"
     (
       id SERIAL PRIMARY KEY,
       name text COLLATE pg_catalog."default" NOT NULL,
       template integer NOT NULL,
       status integer NOT NULL,
-      utc_offset bigint NOT NULL DEFAULT 0
+      utc_offset bigint NOT NULL DEFAULT 0,
+      user_id integer
     );
 
     CREATE TABLE IF NOT EXISTS public."Var"
@@ -71,16 +106,15 @@ export default function (client) {
 
     CREATE TABLE IF NOT EXISTS public."LogicState"
     (
-        id SERIAL PRIMARY KEY,
-        name text COLLATE pg_catalog."default" NOT NULL,
-        value text[] COLLATE pg_catalog."default" NOT NULL
+      id SERIAL PRIMARY KEY,
+      name text COLLATE pg_catalog."default" NOT NULL,
+      value text[] COLLATE pg_catalog."default" NOT NULL
     );
     
-
     CREATE TABLE IF NOT EXISTS public."Template"
     (
-        id SERIAL PRIMARY KEY,
-        name text COLLATE pg_catalog."default" NOT NULL
+      id SERIAL PRIMARY KEY,
+      name text COLLATE pg_catalog."default" NOT NULL
     );
 
     CREATE UNIQUE INDEX ui_field_name_and_parent_type 
@@ -89,28 +123,28 @@ export default function (client) {
     ALTER TABLE IF EXISTS public."Field"
       DROP CONSTRAINT IF EXISTS field_type_id,
       ADD CONSTRAINT field_type_id FOREIGN KEY (type)
-        REFERENCES public."Type" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,
+      REFERENCES public."Type" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS parent_type_id,
       ADD CONSTRAINT parent_type_id FOREIGN KEY (parent_type)
-        REFERENCES public."Type" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,
+      REFERENCES public."Type" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS field_um_id,
       ADD CONSTRAINT field_um_id FOREIGN KEY (um)
-        REFERENCES public."um" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,
+      REFERENCES public."um" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS field_logic_state_id,
       ADD CONSTRAINT field_logic_state_id FOREIGN KEY (logic_state)
-        REFERENCES public."LogicState" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,     
+      REFERENCES public."LogicState" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,     
       DROP CONSTRAINT IF EXISTS unique_field_name_and_parent_type,
       ADD CONSTRAINT unique_field_name_and_parent_type UNIQUE USING INDEX ui_field_name_and_parent_type;
 
@@ -123,40 +157,40 @@ export default function (client) {
       ADD CONSTRAINT unique_device_and_tag_name UNIQUE (device, name),
       DROP CONSTRAINT IF EXISTS tag_parent_tag_id,
       ADD CONSTRAINT tag_parent_tag_id FOREIGN KEY (parent_tag)
-        REFERENCES public."Tag" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,
+      REFERENCES public."Tag" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS tag_device_id,
       ADD CONSTRAINT tag_device_id FOREIGN KEY (device)
-        REFERENCES public."Device" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-        NOT VALID,
+      REFERENCES public."Device" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS tag_var_id,
       ADD CONSTRAINT tag_var_id FOREIGN KEY (var)
-        REFERENCES public."Var" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-        NOT VALID,
+      REFERENCES public."Var" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS tag_type_field_id,
       ADD CONSTRAINT tag_type_field_id FOREIGN KEY (type_field)
-        REFERENCES public."Field" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,
+      REFERENCES public."Field" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS tag_um_id,
       ADD CONSTRAINT tag_um_id FOREIGN KEY (um)
-        REFERENCES public."um" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,
+      REFERENCES public."um" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS tag_logic_state_id,
       ADD CONSTRAINT tag_logic_state_id FOREIGN KEY (logic_state)
-        REFERENCES public."LogicState" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,     
+      REFERENCES public."LogicState" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,     
       DROP CONSTRAINT IF EXISTS unique_device_parent_tag_and_type_field,
       ADD CONSTRAINT unique_device_parent_tag_and_type_field UNIQUE USING INDEX ui_device_parent_tag_and_type_field;
 
@@ -165,33 +199,33 @@ export default function (client) {
       DROP CONSTRAINT IF EXISTS unique_type_name,
       ADD CONSTRAINT unique_type_name UNIQUE (name);
 
-  
+    
     ALTER TABLE IF EXISTS public."Var"
       DROP CONSTRAINT IF EXISTS unique_var_name,
       ADD CONSTRAINT unique_var_name UNIQUE (name),
       DROP CONSTRAINT IF EXISTS var_type_id,
       ADD CONSTRAINT var_type_id FOREIGN KEY (type)
-        REFERENCES public."Type" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,
+      REFERENCES public."Type" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS var_um_id,
       ADD CONSTRAINT var_um_id FOREIGN KEY (um)
-        REFERENCES public."um" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID,
+      REFERENCES public."um" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS var_template_id,
       ADD CONSTRAINT var_template_id FOREIGN KEY (template)
-        REFERENCES public."Template" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
+      REFERENCES public."Template" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
       DROP CONSTRAINT IF EXISTS var_logic_state_id,
       ADD CONSTRAINT var_logic_state_id FOREIGN KEY (logic_state)
-        REFERENCES public."LogicState" (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE NO ACTION
-        NOT VALID;
+      REFERENCES public."LogicState" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE NO ACTION
+      NOT VALID;
 
 
     ALTER TABLE IF EXISTS public."um"
@@ -207,12 +241,32 @@ export default function (client) {
     ALTER TABLE IF EXISTS public."Device"
       DROP CONSTRAINT IF EXISTS unique_device_name,
       ADD CONSTRAINT unique_device_name UNIQUE (name),
+      DROP CONSTRAINT IF EXISTS device_user_id,
+      ADD CONSTRAINT device_user_id FOREIGN KEY (user_id)
+      REFERENCES public."User" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE SET NULL
+      NOT VALID,
       DROP CONSTRAINT IF EXISTS device_template_id,
       ADD CONSTRAINT device_template_id FOREIGN KEY (template)
-        REFERENCES public."Template" (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID;
+      REFERENCES public."Template" (id) MATCH SIMPLE
+      ON UPDATE NO ACTION
+      ON DELETE NO ACTION
+      NOT VALID;
+
+
+    CREATE UNIQUE INDEX ui_provider_and_provider_user_id 
+      ON public."User_Identities" (provider, provider_user_id);
+
+    ALTER TABLE IF EXISTS public."User_Identities"
+      DROP CONSTRAINT IF EXISTS identities_user_id,
+      ADD CONSTRAINT identities_user_id FOREIGN KEY (user_id)
+      REFERENCES public."User" (id) MATCH SIMPLE
+      ON UPDATE CASCADE
+      ON DELETE SET NULL
+      NOT VALID,
+      DROP CONSTRAINT IF EXISTS unique_provider_and_provider_user_id,
+      ADD CONSTRAINT unique_provider_and_provider_user_id UNIQUE USING INDEX ui_provider_and_provider_user_id;
 
 
     ALTER TABLE IF EXISTS public."Template"
@@ -224,27 +278,27 @@ export default function (client) {
     DO $$
     BEGIN
       IF (SELECT COALESCE(MAX(id), 0) FROM public."Type") < 99 THEN
-        PERFORM setval('public."Type_id_seq"', 100);
+      PERFORM setval('public."Type_id_seq"', 100);
       END IF;
 
       IF (SELECT COALESCE(MAX(id), 0) FROM public."Field") < 99 THEN
-        PERFORM setval('public."Field_id_seq"', 100);
+      PERFORM setval('public."Field_id_seq"', 100);
       END IF;
 
       IF (SELECT COALESCE(MAX(id), 0) FROM public."um") < 99 THEN
-        PERFORM setval('public."um_id_seq"', 100);
+      PERFORM setval('public."um_id_seq"', 100);
       END IF;
 
       IF (SELECT COALESCE(MAX(id), 0) FROM public."LogicState") < 99 THEN
-        PERFORM setval('public."LogicState_id_seq"', 100);
+      PERFORM setval('public."LogicState_id_seq"', 100);
       END IF;
 
       IF (SELECT COALESCE(MAX(id), 0) FROM public."Device") < 99 THEN
-        PERFORM setval('public."Device_id_seq"', 100);
+      PERFORM setval('public."Device_id_seq"', 100);
       END IF;
 
       IF (SELECT COALESCE(MAX(id), 0) FROM public."Tag") < 99 THEN
-        PERFORM setval('public."Tag_id_seq"', 100);
+      PERFORM setval('public."Tag_id_seq"', 100);
       END IF;
     END $$;
 
@@ -302,10 +356,10 @@ export default function (client) {
     -- triggers function
     -- FUNCTION: public.return_data()
     CREATE OR REPLACE FUNCTION public.return_data()
-        RETURNS trigger
-        LANGUAGE 'plpgsql'
-        COST 100
-        VOLATILE
+      RETURNS trigger
+      LANGUAGE 'plpgsql'
+      COST 100
+      VOLATILE
     AS $BODY$
     DECLARE
       obj text := '';
@@ -313,16 +367,16 @@ export default function (client) {
     RAISE NOTICE 'obj: %', OLD::text;
       IF (TG_OP = 'UPDATE') THEN
       obj = '{"operation":' || to_json(TG_OP)::text || ',"table":' || to_json(TG_TABLE_NAME)::text || ',"data":' || row_to_json(NEW)::text || '}';
-        PERFORM pg_notify('changes', obj);
-        ELSIF (TG_OP = 'INSERT') THEN
+      PERFORM pg_notify('changes', obj);
+      ELSIF (TG_OP = 'INSERT') THEN
       obj = '{"operation":' || to_json(TG_OP)::text || ',"table":' || to_json(TG_TABLE_NAME)::text || ',"data":' || row_to_json(NEW)::text || '}';
-        PERFORM pg_notify('changes', obj);
-        ELSIF (TG_OP = 'DELETE') THEN 
+      PERFORM pg_notify('changes', obj);
+      ELSIF (TG_OP = 'DELETE') THEN 
       obj = '{"operation":' || to_json(TG_OP)::text || ',"table":' || to_json(TG_TABLE_NAME)::text || ',"data":' || row_to_json(OLD)::text || '}';
-        PERFORM pg_notify('changes', obj);
-        ELSIF (TG_OP = 'TRUNCATE') THEN 
+      PERFORM pg_notify('changes', obj);
+      ELSIF (TG_OP = 'TRUNCATE') THEN 
       obj = '{"operation":' || to_json(TG_OP)::text || ',"table":' || to_json(TG_TABLE_NAME)::text || '}';
-        PERFORM pg_notify('changes', obj);
+      PERFORM pg_notify('changes', obj);
       END IF;
       RETURN NULL;
     END;
@@ -368,7 +422,18 @@ export default function (client) {
     CREATE OR REPLACE TRIGGER LogicStateUpdatingTrigger AFTER UPDATE ON "LogicState" FOR EACH ROW EXECUTE PROCEDURE return_data();
     CREATE OR REPLACE TRIGGER LogicStateDeletingTrigger AFTER DELETE ON "LogicState" FOR EACH ROW EXECUTE PROCEDURE return_data();
     CREATE OR REPLACE TRIGGER LogicStateTruncatingTrigger AFTER TRUNCATE ON "LogicState" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
-  `
+    -- triggers on User
+    CREATE OR REPLACE TRIGGER UserInsertionTrigger AFTER INSERT ON "User" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER UserUpdatingTrigger AFTER UPDATE ON "User" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER UserDeletingTrigger AFTER DELETE ON "User" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER UserTruncatingTrigger AFTER TRUNCATE ON "User" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
+    -- triggers on User_Identities
+    CREATE OR REPLACE TRIGGER UserIdentitiesInsertionTrigger AFTER INSERT ON "User_Identities" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER UserIdentitiesUpdatingTrigger AFTER UPDATE ON "User_Identities" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER UserIdentitiesDeletingTrigger AFTER DELETE ON "User_Identities" FOR EACH ROW EXECUTE PROCEDURE return_data();
+    CREATE OR REPLACE TRIGGER UserIdentitiesTruncatingTrigger AFTER TRUNCATE ON "User_Identities" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
+    `
+
   client.query({
       text: queryString
     })

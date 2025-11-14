@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node ./index.js",
-    "watch": "nodemon",
+    "start": "node ./src/index.js",
+    "watch": "nodemon ./src/index.js",
     "generate-secret": "node generate-secret.js"
   },
   "dependencies": {

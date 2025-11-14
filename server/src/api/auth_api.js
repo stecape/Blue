@@ -1,5 +1,6 @@
 import express from 'express'
 import passport from 'passport'
+import { configurePassport, setDbPool } from './auth_api/passport_config.js'
 
 const router = express.Router()
 
@@ -60,7 +61,14 @@ router.get('/status', (req, res) => {
 })
 
 // Funzione per inizializzare le API di autenticazione
-const auth_api = (app) => {
+const auth_api = (app, pool) => {
+  // Configura Passport prima di usare le routes
+  setDbPool(pool)
+  configurePassport()
+  app.use(passport.initialize())
+  app.use(passport.session())
+  
+  // Registra le routes
   app.use('/auth', router)
 }
 
