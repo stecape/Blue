@@ -6,9 +6,10 @@ import { useAuth } from "./Helpers/AuthContext"
 import Login from "./sections/Login/Login"
 import Unauthorized from "./sections/Unauthorized/Unauthorized"
 import Layout from "./Layout"
+import UserApp from "./UserApp/UserApp"
 
 const AuthenticatedApp = () => {
-  const { authenticated, loading } = useAuth()
+  const { authenticated, loading, user } = useAuth()
 
   if (loading) {
     return (
@@ -18,8 +19,7 @@ const AuthenticatedApp = () => {
         alignItems: 'center',
         minHeight: '100vh',
         fontSize: '18px',
-        color: '#667eea',
-        backgroundColor: '#f7fafc'
+        backgroundColor: '#ffffffff'
       }}>
         Verifica autenticazione...
       </div>
@@ -41,18 +41,24 @@ const AuthenticatedApp = () => {
     )
   }
 
-  // Se autenticato, inizializza il contesto e mostra l'app completa
-  return (
-    <SocketContext.Provider value={socket}>
-      <CtxProvider>
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <Configuration>
-            <Layout />
-          </Configuration>
-        </BrowserRouter>
-      </CtxProvider>
-    </SocketContext.Provider>
-  )
+  // Se autenticato, controlla il ruolo
+  if (user?.role === 'admin') {
+    // Admin: app completa con SocketContext e CtxProvider
+    return (
+      <SocketContext.Provider value={socket}>
+        <CtxProvider>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Configuration>
+              <Layout />
+            </Configuration>
+          </BrowserRouter>
+        </CtxProvider>
+      </SocketContext.Provider>
+    )
+  } else {
+    // User: app semplificata senza CtxProvider
+    return <UserApp />
+  }
 }
 
 export default AuthenticatedApp

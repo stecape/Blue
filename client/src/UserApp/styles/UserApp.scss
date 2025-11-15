@@ -1,0 +1,89 @@
+// User App Styles
+.user-app {
+  min-height: 100vh;
+  background: #f1f1f1;
+}
+
+.user-header {
+  background: #dddddd;
+  color:#3b3b3b;
+  padding: 1.2rem 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid #a5a5a5;
+}
+
+.user-header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.plant-icon {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  animation: gentle-sway 3s ease-in-out infinite;
+}
+
+@keyframes gentle-sway {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #3b3b3b !important;
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid  #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  span {
+    font-weight: 500;
+  }
+}
+
+.logout-btn {
+  padding: 0.5rem 1.25rem;
+  background:  #5a9c5d;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    background:  #5a9c5d;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+}
+
+.user-main {
+  padding: 2rem 0;
+}
