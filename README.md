@@ -1,5 +1,5 @@
-# What is AMARILLO
-MQTT ComDriver between a Node-React-Express-PostgreSQL WebApp and ESP32
+# What is Blue
+Authentication and user management 
 # Getting Started
 You need a Postgres database running. Docker is a good solution.
 
