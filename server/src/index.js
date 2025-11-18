@@ -8,9 +8,12 @@ import controls_api from './api/controls_api.js'
 import auth_api from './api/auth_api.js'
 import user_api from './api/user_api.js'
 import session from 'express-session'
+import pgSession from 'connect-pg-simple'
 import dotenv from 'dotenv'
 
 dotenv.config()
+
+const PostgresStore = pgSession(session)
 
 const startApp = () => {
   //initialize the WebSocket server and the express app
@@ -18,21 +21,6 @@ const startApp = () => {
   
   // Trust proxy - necessario quando si è dietro nginx
   expressApp.set('trust proxy', 1)
-  
-  // Configurazione sessioni
-  expressApp.use(
-    session({
-      secret: process.env.SESSION_SECRET || 'your-secret-key',
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        secure: process.env.NODE_ENV === 'production', // true solo in produzione con HTTPS
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24, // 24 ore
-        sameSite: 'lax' // Importante per OAuth
-      }
-    })
-  )
 
   //initialize the WebSocket message broker, that collects the messages from the globalEventEmitter (backend internal emitter) and sends them to the clients that are destinated to the WebSocket
   app_wsMessageBroker(connection)
@@ -43,6 +31,26 @@ const startApp = () => {
   //initialize the database manager
   db_manager()
     .then((pool) => {
+      // Configurazione sessioni con PostgreSQL
+      expressApp.use(
+        session({
+          store: new PostgresStore({
+            pool: pool,
+            tableName: 'session',
+            createTableIfMissing: true
+          }),
+          secret: process.env.SESSION_SECRET || 'your-secret-key',
+          resave: false,
+          saveUninitialized: false,
+          cookie: {
+            secure: process.env.NODE_ENV === 'production',
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24, // 24 ore
+            sameSite: 'lax'
+          }
+        })
+      )
+      
       auth_api(expressApp, pool)
       db_api(expressApp, pool)
       mqtt_api(expressApp, pool)
