@@ -1,9 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MessageQueue } from "@react-md/alert"
-import { AuthProvider } from "./Helpers/AuthContext"
-import AuthenticatedApp from "./AuthenticatedApp"
-import './styles/index.scss'
+import { AuthProvider } from "./Auth/AuthContext"
+import AuthenticatedApp from "./Auth/AuthenticatedApp"
+import './AdminApp/styles/index.scss'
 
 const rootElement = document.getElementById('root')
 const root = createRoot(rootElement)

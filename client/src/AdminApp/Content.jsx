@@ -13,7 +13,7 @@ import NoPage from "./sections/NoPage/NoPage"
 import Trend from "./sections/Trend/Trend"
 import Oven from "./sections/Oven/Oven"
 
-function App () {
+function Content () {
   return (
   <>
     <NestedDialogContextProvider>
@@ -34,4 +34,4 @@ function App () {
     </NestedDialogContextProvider>
   </>
 )}
-export default App
+export default Content

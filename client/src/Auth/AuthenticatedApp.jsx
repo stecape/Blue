@@ -1,12 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { Configuration } from "@react-md/layout"
-import { SocketContext, socket } from './Helpers/socket'
-import { CtxProvider } from "./Helpers/CtxProvider"
-import { useAuth } from "./Helpers/AuthContext"
-import Login from "./sections/Login/Login"
-import Unauthorized from "./sections/Unauthorized/Unauthorized"
-import Layout from "./Layout"
-import UserApp from "./UserApp/UserApp"
+import { useAuth } from "./AuthContext"
+import Login from "./Login/Login"
+import Unauthorized from "./Unauthorized/Unauthorized"
+import UserApp from "../UserApp/UserApp"
+import AdminApp from "../AdminApp/AdminApp"
 
 const AuthenticatedApp = () => {
   const { authenticated, loading, user } = useAuth()
@@ -44,17 +42,7 @@ const AuthenticatedApp = () => {
   // Se autenticato, controlla il ruolo
   if (user?.role === 'admin') {
     // Admin: app completa con SocketContext e CtxProvider
-    return (
-      <SocketContext.Provider value={socket}>
-        <CtxProvider>
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <Configuration>
-              <Layout />
-            </Configuration>
-          </BrowserRouter>
-        </CtxProvider>
-      </SocketContext.Provider>
-    )
+    return <AdminApp />
   } else {
     // User: app semplificata senza CtxProvider
     return <UserApp />

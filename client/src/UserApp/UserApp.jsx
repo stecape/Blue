@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import MyDevices from './sections/MyDevices/MyDevices'
-import { useAuth } from '../Helpers/AuthContext'
+import { useAuth } from '../Auth/AuthContext'
 import './styles/UserApp.scss'
 
 const UserApp = () => {

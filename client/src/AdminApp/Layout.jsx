@@ -19,12 +19,12 @@ import { SignalWifiOffFontIcon } from "@react-md/material-icons"
 import { ExitToAppFontIcon } from "@react-md/material-icons"
 import { useLocation, Link } from "react-router-dom"
 import { ctxData } from "./Helpers/CtxProvider"
-import { useAuth } from "./Helpers/AuthContext"
+import { useAuth } from "../Auth/AuthContext"
 import navItems from "./navItems"
 
 import './styles/Layout.scss'
 
-import App from "./App"
+import Content from "./Content"
 const appBar = (pathname, backendConnected, dbConnected, mqttConnected, user, logout) => {
   return (
     <LayoutAppBar theme="primary">
@@ -83,7 +83,7 @@ export default function MyLayout() {
       mainProps={elementProps}
     >
       <div className={APP_BAR_OFFSET_CLASSNAME}>
-        <App />
+        <Content />
       </div>
     </Layout>
   )

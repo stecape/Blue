@@ -1,4 +1,4 @@
-import { useAuth } from '../../Helpers/AuthContext'
+import { useAuth } from '../AuthContext.jsx'
 import styles from './Login.module.scss'
 
 const Login = () => {
