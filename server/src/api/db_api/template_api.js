@@ -1,4 +1,5 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
 
@@ -42,7 +43,7 @@ export default function (app, pool) {
    */
 
   // Aggiungi un template
-  app.post('/api/addTemplate', (req, res) => {
+  app.post('/api/addTemplate', isAdmin, (req, res) => {
     const queryString = `INSERT INTO "Template" (id, name) VALUES (DEFAULT, '${req.body.name}') RETURNING id`;
     pool.query({
       text: queryString,
@@ -55,7 +56,7 @@ export default function (app, pool) {
   });
 
   // Modifica un template
-  app.post('/api/modifyTemplate', (req, res) => {
+  app.post('/api/modifyTemplate', isAdmin, (req, res) => {
     const queryString = `UPDATE "Template" SET name = '${req.body.name}', WHERE id = ${req.body.id}`;
     pool.query({
       text: queryString,
@@ -68,7 +69,7 @@ export default function (app, pool) {
   });
 
   // Ottieni tutti i template
-  app.get('/api/getTemplates', (req, res) => {
+  app.get('/api/getTemplates', isAdmin, (req, res) => {
     const queryString = `SELECT * FROM "Template"`;
     pool.query({
       text: queryString,
@@ -79,7 +80,7 @@ export default function (app, pool) {
   });
 
   // Elimina un template
-  app.post('/api/removeTemplate', (req, res) => {
+  app.post('/api/removeTemplate', isAdmin, (req, res) => {
     const checkDevicesQuery = `SELECT COUNT(*) FROM "Device" WHERE template = ${req.body.id}`;
     pool.query({
       text: checkDevicesQuery,

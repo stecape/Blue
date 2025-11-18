@@ -12,6 +12,17 @@ export const isAuthenticated = (req, res, next) => {
   res.status(401).json({ authenticated: false, message: 'Not authenticated' })
 }
 
+// Middleware per verificare se l'utente è admin
+export const isAdmin = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ authenticated: false, message: 'Not authenticated' })
+  }
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied. Admin only.' })
+  }
+  next()
+}
+
 // Route per iniziare il processo di autenticazione con Google
 router.get('/google', 
   passport.authenticate('google', { 

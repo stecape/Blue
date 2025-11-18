@@ -1,4 +1,5 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
 
@@ -216,7 +217,7 @@ export default function (app, pool) {
   Res:    200
   Err:    400
   */
-  app.post('/api/deleteTags', (req, res) => {
+  app.post('/api/deleteTags', isAdmin, (req, res) => {
     const { deviceIds = [], varIds = [], deviceId = null } = req.body;
     DeleteTags(pool, { deviceIds, varIds, deviceId })
       .then(data => res.json({ result: data, message: "Query executed, tags deleted" }))
@@ -237,7 +238,7 @@ export default function (app, pool) {
   Res:    200
   Err:    400
   */
-  app.post('/api/refreshTags', (req, res) => {
+  app.post('/api/refreshTags', isAdmin, (req, res) => {
     const { templateId = null, typeId = null, deviceId = null } = req.body;
 
     GenerateTags(pool, { templateId, typeId, deviceId })

@@ -1,4 +1,5 @@
 import globalEventEmitter from '../Helpers/globalEventEmitter.js';
+import { isAuthenticated, isAdmin } from './auth_api.js';
 import device_api from './db_api/device_api.js'
 import field_api from './db_api/field_api.js'
 import logic_state_api from './db_api/logic_state_api.js'
@@ -20,7 +21,7 @@ export default function (app, pool) {
 
   
   /*
-  Execute a query
+  Execute a query (solo admin)
   Type:   POST
   Route:  '/api/exec'
   Body:   {
@@ -35,7 +36,7 @@ export default function (app, pool) {
   Res:    200
   Err:    400
   */
-  app.post('/api/exec', (req, res) => {
+  app.post('/api/exec', isAdmin, (req, res) => {
     var queryString=req.body.query
     console.log(queryString)
     pool.query({
@@ -49,7 +50,7 @@ export default function (app, pool) {
 
 
   /*
-  Get all records
+  Get all records (autenticato - admin vede tutto, user filtrato)
   Type:   POST
   Route:  '/api/getAll'
   Body:   { 
@@ -68,7 +69,7 @@ export default function (app, pool) {
           }
   Err:    400
   */
-  app.post('/api/getAll', (req, res) => {
+  app.post('/api/getAll', isAuthenticated, (req, res) => {
     var queryString=`SELECT ${req.body.fields.join(',')} FROM "${req.body.table}" ORDER BY id ASC`
     //console.log(queryString)
     pool.query({

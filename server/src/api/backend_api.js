@@ -1,6 +1,8 @@
 import {dbConnected} from '../DB/db_manager.js' 
 import {mqttClient} from './mqtt_api.js' 
 
+import { isAuthenticated } from './auth_api.js';
+
 export default function (app) {
 
   app.get('/', (req, res) => {
@@ -13,7 +15,7 @@ export default function (app) {
   * Get Backend Status
   * This API returns the status of the backend
   */
-  app.post('/api/getBackendStatus', (req, res) => {
+  app.post('/api/getBackendStatus', isAuthenticated, (req, res) => {
     res.json({
       result: {
         dbConnected: dbConnected,

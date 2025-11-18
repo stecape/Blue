@@ -1,4 +1,5 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
 
@@ -22,7 +23,7 @@ export default function (app, pool) {
 
   */
 
-  app.post('/api/addVar', (req, res) => {
+  app.post('/api/addVar', isAdmin, (req, res) => {
     var typesList, fieldsList;
     var varTemplate = req.body.template;
     var varName = req.body.name;
@@ -83,7 +84,7 @@ export default function (app, pool) {
 
   */
 
-  app.post('/api/modifyVar', (req, res) => {
+  app.post('/api/modifyVar', isAdmin, (req, res) => {
     var varId, typesList, fieldsList;
     var varTemplate = req.body.template;
     var varName = req.body.name;
@@ -142,7 +143,7 @@ export default function (app, pool) {
   Res:    200
   Err:    400
   */
-  app.post('/api/removeVar', (req, res) => {
+  app.post('/api/removeVar', isAdmin, (req, res) => {
     var queryString=`DELETE FROM "Var" WHERE id = ${req.body.id};`
     pool.query({
       text: queryString,
@@ -170,7 +171,7 @@ export default function (app, pool) {
           }
   Err:    400
   */
-  app.post('/api/getVars', (req, res) => {
+  app.post('/api/getVars', isAdmin, (req, res) => {
     let queryString = `SELECT * FROM "Var" WHERE template = ${req.body.template} ORDER BY id`;
 
     pool.query({

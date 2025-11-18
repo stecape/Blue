@@ -1,6 +1,7 @@
 import globalEventEmitter from '../Helpers/globalEventEmitter.js'
 import mqtt from 'mqtt'
 import { mqtt_client_id } from '../App/app_config.js'
+import { isAuthenticated } from './auth_api.js'
 
 export var mqttClient = {connected: false}
 
@@ -114,7 +115,7 @@ export default function (app, pool) {
   Res:    200
   Err:    400
   */
-  app.post('/api/mqtt/write', (req, res) => {
+  app.post('/api/mqtt/write', isAuthenticated, (req, res) => {
     console.log({device: req.body.device, id:req.body.id, value:req.body.value})
     mqttWrite(req.body.device, {id:req.body.id, value:req.body.value})
     res.json({result: {device: req.body.device, id:req.body.id, value:req.body.value}, message: "Message sent"})
@@ -130,7 +131,7 @@ export default function (app, pool) {
           }
   Res:    200
   */
-  app.post('/api/mqtt/alarms_ack', (req, res) => {
+  app.post('/api/mqtt/alarms_ack', isAuthenticated, (req, res) => {
     devices.forEach(device => {
       mqttClient.publish(`/command/${device}`, JSON.stringify({id: 0, value: 4}))
     })

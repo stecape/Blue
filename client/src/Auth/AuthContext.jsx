@@ -25,9 +25,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await axios.get(`${API_URL}/auth/status`, {
-        withCredentials: true
-      })
+      const response = await axios.get(`${API_URL}/auth/status`)
       
       if (response.data.authenticated) {
         setUser(response.data.user)
@@ -52,9 +50,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.get(`${API_URL}/auth/logout`, {
-        withCredentials: true
-      })
+      await axios.get(`${API_URL}/auth/logout`)
       setUser(null)
       setAuthenticated(false)
       window.location.href = '/login'

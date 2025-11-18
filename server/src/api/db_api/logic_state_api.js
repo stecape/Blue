@@ -1,4 +1,5 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
 
@@ -24,7 +25,7 @@ export default function (app, pool) {
           }
   */
 
-  app.post('/api/addLogicState', (req, res) => {
+  app.post('/api/addLogicState', isAdmin, (req, res) => {
     var queryString = `INSERT INTO "LogicState" (id, name, value) VALUES (DEFAULT,'${req.body.name}',ARRAY[${req.body.value.map(item => `'${item}'`)}])`
     pool.query({
       text: queryString,
@@ -58,7 +59,7 @@ export default function (app, pool) {
   Err:    400
   */      
 
-  app.post('/api/modifyLogicState', (req, res) => {
+  app.post('/api/modifyLogicState', isAdmin, (req, res) => {
     var queryString = `UPDATE "LogicState" SET name='${req.body.name}', value=ARRAY[${req.body.value.map(item => `'${item}'`)}] WHERE id = ${req.body.id}`
     //console.log(queryString)
     pool.query({
@@ -88,7 +89,7 @@ export default function (app, pool) {
   Res:    200
   Err:    400
   */
-  app.post('/api/removeLogicState', (req, res) => {
+  app.post('/api/removeLogicState', isAdmin, (req, res) => {
     var queryString=`DELETE FROM "LogicState" WHERE id = ${req.body.id};`
     pool.query({
       text: queryString,

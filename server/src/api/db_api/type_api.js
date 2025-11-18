@@ -1,4 +1,5 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
 
@@ -16,7 +17,7 @@ export default function (app, pool) {
   Res:    200
   Err:    400
   */
-  app.post('/api/removeType', (req, res) => {
+  app.post('/api/removeType', isAdmin, (req, res) => {
     var queryString=`DELETE FROM "Field" WHERE parent_type = ${req.body.id}; DELETE FROM "Type" WHERE id = ${req.body.id}`
     pool.query({
       text: queryString,

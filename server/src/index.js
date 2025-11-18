@@ -25,9 +25,6 @@ const startApp = () => {
   //initialize the WebSocket message broker, that collects the messages from the globalEventEmitter (backend internal emitter) and sends them to the clients that are destinated to the WebSocket
   app_wsMessageBroker(connection)
 
-  //initialize the backend API, that allows to request the backend status
-  backend_api(expressApp)
-
   //initialize the database manager
   db_manager()
     .then((pool) => {
@@ -51,7 +48,12 @@ const startApp = () => {
         })
       )
       
+      // IMPORTANTE: auth_api deve essere chiamato PRIMA delle altre API
+      // perché inizializza Passport
       auth_api(expressApp, pool)
+      
+      // Ora registra le altre API che usano isAuthenticated/isAdmin
+      backend_api(expressApp)
       db_api(expressApp, pool)
       mqtt_api(expressApp, pool)
       controls_api(expressApp, pool)

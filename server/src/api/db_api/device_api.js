@@ -1,4 +1,5 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { isAuthenticated, isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
 
@@ -33,8 +34,8 @@ export default function (app, pool) {
    * @returns {Object} - Un array di dispositivi e un messaggio di conferma.
    */
 
-  // Aggiungi un dispositivo
-  app.post('/api/addDevice', (req, res) => {
+  // Aggiungi un dispositivo (solo admin)
+  app.post('/api/addDevice', isAdmin, (req, res) => {
     console.log(req.body)
     const queryString = `INSERT INTO "Device" (id, name, template, status) VALUES (DEFAULT, '${req.body.name}', '${req.body.template}', 0) RETURNING id`;
     pool.query({
@@ -49,8 +50,8 @@ export default function (app, pool) {
     .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
 
-  // Modifica un dispositivo
-  app.post('/api/modifyDevice', (req, res) => {
+  // Modifica un dispositivo (solo admin)
+  app.post('/api/modifyDevice', isAdmin, (req, res) => {
     const queryString = `UPDATE "Device" SET name = '${req.body.name}' WHERE id = ${req.body.id}`;
     pool.query({
       text: queryString,
@@ -63,9 +64,17 @@ export default function (app, pool) {
     .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
 
-  // Ottieni tutti i dispositivi
-  app.get('/api/getDevices', (req, res) => {
-    const queryString = `SELECT * FROM "Device"`;
+  // Ottieni tutti i dispositivi (autenticato, filtrato per ruolo)
+  app.get('/api/getDevices', isAuthenticated, (req, res) => {
+    // Admin vede tutti i device, user solo i propri
+    let queryString;
+    if (req.user.role === 'admin') {
+      queryString = `SELECT * FROM "Device"`;
+    } else {
+      // User vede solo i device che possiede
+      queryString = `SELECT * FROM "Device" WHERE user_id = ${req.user.id}`;
+    }
+    
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -74,8 +83,8 @@ export default function (app, pool) {
     .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
   
-  // Elimina un dispositivo
-  app.post('/api/removeDevice', (req, res) => {
+  // Elimina un dispositivo (solo admin)
+  app.post('/api/removeDevice', isAdmin, (req, res) => {
     var queryString=`DELETE FROM "Device" WHERE id = ${req.body.id};`
     pool.query({
       text: queryString,

@@ -125,12 +125,20 @@ The object is structured as follows:
 
 import globalEventEmitter from '../Helpers/globalEventEmitter.js';
 
+import { isAuthenticated } from './auth_api.js';
+
 export default function (app, pool) {
 
-  app.post('/api/getAllControls', async (req, res) => {
+  app.post('/api/getAllControls', isAuthenticated, async (req, res) => {
     try {
-      // Recupera tutti i device e i loro template
-      const deviceQuery = `SELECT id, name, template FROM "Device"`;
+      // Recupera tutti i device e i loro template (filtrati per user se non admin)
+      let deviceQuery;
+      if (req.user.role === 'admin') {
+        deviceQuery = `SELECT id, name, template FROM "Device"`;
+      } else {
+        deviceQuery = `SELECT id, name, template FROM "Device" WHERE user_id = ${req.user.id}`;
+      }
+      
       const deviceResult = await pool.query({
         text: deviceQuery,
         rowMode: 'array',

@@ -1,4 +1,5 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
 
@@ -18,7 +19,7 @@ export default function (app, pool) {
           INSERT INTO "um" (name, metric, imperial, gain, "offset") VALUES ('m_ft', 'm', 'ft', 3.28084, 0);
   */
 
-  app.post('/api/addUm', (req, res) => {
+  app.post('/api/addUm', isAdmin, (req, res) => {
     var queryString = `INSERT INTO "um" (id, name, metric, imperial, gain, "offset") VALUES (DEFAULT,'${req.body.name}','${req.body.metric}','${req.body.imperial}',${req.body.gain},${req.body.offset})`
     pool.query({
       text: queryString,
@@ -45,7 +46,7 @@ export default function (app, pool) {
           UPDATE "um" SET (name = "m_ft", metric = "m", imperial = "ft", gain = 3.28084, "offset" = 0) WHERE id = 1;
   */      
 
-  app.post('/api/modifyUm', (req, res) => {
+  app.post('/api/modifyUm', isAdmin, (req, res) => {
     var queryString = `UPDATE "um" SET name='${req.body.name}', metric='${req.body.metric}', imperial='${req.body.imperial}', gain=${req.body.gain}, "offset"=${req.body.offset} WHERE id = ${req.body.id}`
     //console.log(queryString)
     pool.query({
@@ -71,7 +72,7 @@ export default function (app, pool) {
   Res:    200
   Err:    400
   */
-  app.post('/api/removeUm', (req, res) => {
+  app.post('/api/removeUm', isAdmin, (req, res) => {
     var queryString=`DELETE FROM "um" WHERE id = ${req.body.id};`
     pool.query({
       text: queryString,

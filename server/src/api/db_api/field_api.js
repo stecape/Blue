@@ -1,4 +1,5 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
 
@@ -176,7 +177,7 @@ export default function (app, pool) {
           }
   Err:    400
   */
-  app.post('/api/getFields', (req, res) => {
+  app.post('/api/getFields', isAdmin, (req, res) => {
     getDeps(req.body.type)
     .then(response => {
       res.json({result: response, message: "Record(s) from table \"Field\" returned correctly"})

@@ -14,9 +14,7 @@ const MyDevices = () => {
   const fetchDevices = async () => {
     try {
       setLoading(true)
-      const response = await axios.post('/api/user/devices', {}, {
-        withCredentials: true
-      })
+      const response = await axios.post('/api/user/devices')
       setDevices(response.data.devices)
       setError(null)
     } catch (err) {
