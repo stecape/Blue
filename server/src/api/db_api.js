@@ -8,6 +8,7 @@ import template_api from './db_api/template_api.js'
 import type_api from './db_api/type_api.js'
 import um_api from './db_api/um_api.js'
 import var_api from './db_api/var_api.js'
+import user_api from './db_api/user_api.js'
 
 export default function (app, pool) {
   device_api(app, pool)
@@ -18,6 +19,7 @@ export default function (app, pool) {
   type_api(app, pool)
   um_api(app, pool)
   var_api(app, pool)
+  user_api(app, pool)
 
   
   /*

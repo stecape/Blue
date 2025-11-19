@@ -6,7 +6,7 @@ import db_api from './api/db_api.js'
 import mqtt_api from './api/mqtt_api.js'
 import controls_api from './api/controls_api.js'
 import auth_api from './api/auth_api.js'
-import user_api from './api/user_api.js'
+import user_app_api from './api/user_app_api.js'
 import session from 'express-session'
 import pgSession from 'connect-pg-simple'
 import dotenv from 'dotenv'
@@ -57,7 +57,7 @@ const startApp = () => {
       db_api(expressApp, pool)
       mqtt_api(expressApp, pool)
       controls_api(expressApp, pool)
-      user_api(expressApp, pool)
+      user_app_api(expressApp, pool)
     })
     .catch(() => {
       console.error('Index: Error connecting to the database')

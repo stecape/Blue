@@ -6,6 +6,7 @@ import Um from "./sections/Um/Um"
 import LogicState from "./sections/LogicState/LogicState"
 import Templates from "./sections/Templates/Templates"
 import Devices from "./sections/Devices/Devices"
+import Users from "./sections/Users/Users"
 import Alarms from "./sections/Alarms/Alarms"
 import Tags from "./sections/Tags/Tags"
 import Controls from "./sections/Controls/Controls"
@@ -24,6 +25,7 @@ function Content () {
         <Route path="logicState" element={<LogicState/>} />
         <Route path="templates" element={<Templates/>} />
         <Route path="devices" element={<Devices/>} />
+        <Route path="users" element={<Users/>} />
         <Route path="alarms" element={<Alarms/>} />
         <Route path="tags" element={<Tags/>} />
         <Route path="controls" element={<Controls/>} />

@@ -1,4 +1,4 @@
-import { HomeFontIcon, AllOutFontIcon, SettingsInputComponentFontIcon, DevicesOtherFontIcon, BatteryUnknownFontIcon, TransformFontIcon, ErrorFontIcon, WhatshotSVGIcon } from "@react-md/material-icons";
+import { HomeFontIcon, AllOutFontIcon, SettingsInputComponentFontIcon, DevicesOtherFontIcon, BatteryUnknownFontIcon, TransformFontIcon, ErrorFontIcon, WhatshotSVGIcon, PeopleFontIcon } from "@react-md/material-icons";
 import { ReactComponent as TrendSVGIcon } from "./sections/Trend/Trend.svg";
 
 /**
@@ -29,6 +29,7 @@ const navItems = {
   "/logicState": createRoute("/logicState", "Logic State", <TransformFontIcon />),
   "/templates": createRoute("/templates", "Device Templates", <BatteryUnknownFontIcon />),
   "/devices": createRoute("/devices", "Devices", <DevicesOtherFontIcon />),
+  "/users": createRoute("/users", "Users", <PeopleFontIcon />),
   "/alarms": createRoute("/alarms", "Alarms", <ErrorFontIcon />),
   "/tags": createRoute("/tags", "Tags", <SettingsInputComponentFontIcon />),
   "/controls": createRoute("/controls", "Controls", <SettingsInputComponentFontIcon />),
