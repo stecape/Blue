@@ -234,8 +234,7 @@ void *PLC_pointer[${structs.tagPointer.length}] = {
         <GridCell colSpan={12} className={gridStyles.item}>
           <DropdownMenu
             id="device-dropdown-menu"
-            buttonChildren="Select Device"
-            onClick={(event) => setSelectedDevice(event.currentTarget.textContent)}
+            buttonChildren={selectedDevice ? devices.find(d => d.id === selectedDevice)?.name : "Select Device"}
           >
             {devices.map((device) => (
               <MenuItem key={device.id} onClick={() => setSelectedDevice(device.id)}>

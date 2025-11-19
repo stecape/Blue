@@ -116,7 +116,6 @@ function VarsList () {
                 var typeItem = ctx.types.find(i => i.id === item.type)
                 var umItem = ctx.ums.find(i => i.id === item.um)
                 var logic_stateItem = ctx.logicStates.find(i => i.id === item.logic_state)
-                console.log(item)
                 return (
                   <TableRow
                     key={item.id}

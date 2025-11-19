@@ -20,8 +20,8 @@ function DevicesList () {
   // Usa la variabile d'ambiente per configurare l'URL del server
   const serverIp = getApiUrl()
   const ctx = useContext(ctxData)
-  const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyDevicePopup, setModifyDevicePopup] = useState({ visible: false, id: 0, name: '' })
+  const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '', template: '', user_id: '' })
+  const [modifyDevicePopup, setModifyDevicePopup] = useState({ visible: false, id: 0, name: '', template: '', user_id: '' })
   const [createDevicePopup, setCreateDevicePopup] = useState({ visible: false })
   
 
@@ -33,6 +33,7 @@ function DevicesList () {
             <TableRow>
               <TableCell hAlign="left" grow >Name</TableCell>
               <TableCell hAlign="letf">Template</TableCell>
+              <TableCell hAlign="left">Owner</TableCell>
               <TableCell hAlign="left">UTC offset</TableCell>
               <TableCell hAlign="center">Status</TableCell>
               <TableCell hAlign="center">Actions</TableCell>
@@ -46,6 +47,7 @@ function DevicesList () {
                   >
                     <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                     <TableCell className={tableStyles.cell} hAlign="left">{ctx.templates.find(t => item.template === t.id)?.name || item.template}</TableCell>
+                    <TableCell className={tableStyles.cell} hAlign="left">{ctx.users.find(o => item.user_id === o.id)?.name + " " + ctx.users.find(o => item.user_id === o.id)?.email || item.user_id}</TableCell>
                     <TableCell className={tableStyles.cell} hAlign="left">{item.utc_offset}</TableCell>
                     <TableCell className={tableStyles.cell} hAlign="center">{item.status === 0 || item.status == null ? "Offline" : "Online"}</TableCell>
                     <TableCell className={tableStyles.cell}>
@@ -60,7 +62,7 @@ function DevicesList () {
                       <Button
                         buttonType="icon"
                         aria-label="Edit"
-                        onClick={()=> setModifyDevicePopup({visible: true, id: item.id, name: item.name})}
+                        onClick={()=> setModifyDevicePopup({visible: true, id: item.id, name: item.name, template: item.template, user_id: item.user_id})}
                       >
                         <EditFontIcon />
                       </Button>
@@ -88,6 +90,8 @@ function DevicesList () {
       <UpsertDevicePopup 
         visible={modifyDevicePopup.visible}
         name={modifyDevicePopup.name}
+        template={modifyDevicePopup.template}
+        user_id={modifyDevicePopup.user_id}
         modalType="full-page"
         upsertDevice={(data)=>{
           axios.post(`${serverIp}/api/modifyDevice`, {...data, id: modifyDevicePopup.id})

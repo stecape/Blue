@@ -55,7 +55,7 @@ function NewVar () {
       setUpsertTemplate((prevState) => ({
         ...prevState, 
         vars: [...upsertTemplate.vars, { type: type, template: upsertTemplate.template, name: name, um: um, logic_state: logic_state, comment: comment, QRef: QRef}],
-        insertQuery: [...upsertTemplate.insertQuery, {query: `INSERT into "Var" (id, name, template, type, um, logic_state, comment) VALUES (DEFAULT, '${name}', templateId, ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, ${comment !== null ? `'${comment}'` : ''});`, QRef: QRef}]}), handleReset()
+        insertQuery: [...upsertTemplate.insertQuery, {query: `INSERT into "Var" (id, name, template, type, um, logic_state, comment) VALUES (DEFAULT, '${name}', templateId, ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, ${comment !== '' ? `'${comment}'` : 'NULL'});`, QRef: QRef}]}), handleReset()
       )
     }
   }

@@ -20,7 +20,8 @@ function UpsertDevicePopup (props) {
     visible: false,
     name: '',
     modalType: props.modalType,
-    template: 0
+    template: 0,
+    user_id: 0
   })
   
   //Form Events
@@ -28,18 +29,19 @@ function UpsertDevicePopup (props) {
     event.preventDefault()
     props.upsertDevice({
       name: modalState.name,
-      template: modalState.template
+      template: modalState.template,
+      user_id: modalState.user_id
     })
-    setModalState((prevState) => ({ ...prevState, name: "", template: 0}))
+    setModalState((prevState) => ({ ...prevState, name: "", template: 0, user_id: 0}))
   }
   const handleReset = () => {
-    setModalState((prevState) => ({ ...prevState, name: ""}))
+    setModalState((prevState) => ({ ...prevState, name: "", template: 0, user_id: 0}))
     props.cancelCommand()
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, visible: props.visible}))
-  },[props.name, props.visible])
+    setModalState((prevState) => ({ ...prevState, name: props.name, template: props.template, user_id: props.user_id, visible: props.visible}))
+  },[props.name, props.template, props.user_id, props.visible])
   
   return (
     <Dialog
@@ -79,13 +81,30 @@ function UpsertDevicePopup (props) {
                         label: item.name,
                         value: item.id,
                       }))}
-                      value={modalState.template.toString()}
+                      value={(modalState.template || 0).toString()}
                       label="Template"
                       className={formStyles.item}
                       onChange={(value) =>
                         setModalState((prevState) => ({
                           ...prevState,
                           template: Number(value),
+                        }))
+                      }
+                    />
+                    <Select
+                      id="user_id"
+                      key="user_id"
+                      options={ctx.users.map((item) => ({
+                        label: item.name + " " + item.email,
+                        value: item.id,
+                      }))}
+                      value={(modalState.user_id || 0).toString()}
+                      label="User"
+                      className={formStyles.item}
+                      onChange={(value) =>
+                        setModalState((prevState) => ({
+                          ...prevState,
+                          user_id: Number(value),
                         }))
                       }
                     />

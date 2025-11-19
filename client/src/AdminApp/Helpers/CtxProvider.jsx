@@ -21,6 +21,7 @@ export const CtxProvider = ({ children }) => {
   const [tags, setTags] = useState([])
   const [backendStatus, setBackendStatus] = useState({backendConnected: socket.connected, dbConnected: false, mqttConnected: false})
   const [init, setInit] = useState(false)
+  const [users, setUsers] = useState([])
   const [devices, setDevices] = useState([])
   const [templates, setTemplates] = useState([])
   const [controls, setControls] = useState([]) //array di oggetti. Ogni oggetto conterrà le tagId appartenenti ad un certo data type
@@ -47,7 +48,8 @@ export const CtxProvider = ({ children }) => {
             axios.post(`${serverIp}/api/getAll`, { table: "LogicState", fields: ['id', 'name', 'value'] }),
             axios.post(`${serverIp}/api/getAll`, { table: "Var", fields: ['id', 'name', 'template', 'type', 'um', 'logic_state', 'comment'] }),
             axios.post(`${serverIp}/api/getAll`, { table: "Tag", fields: ['id', 'name', 'device', 'var', 'parent_tag', 'type_field', 'um', 'logic_state', 'comment', 'value'] }),
-            axios.post(`${serverIp}/api/getAll`, { table: "Device", fields: ['id', 'name', 'template', 'status', 'utc_offset'] }),
+            axios.post(`${serverIp}/api/getAll`, { table: "User", fields: ['id', 'name', 'email', 'role'] }),
+            axios.post(`${serverIp}/api/getAll`, { table: "Device", fields: ['id', 'name', 'user_id', 'template', 'status', 'utc_offset'] }),
             axios.post(`${serverIp}/api/getAll`, { table: "Template", fields: ['id', 'name'] }),
             axios.post(`${serverIp}/api/getAllControls`),
             axios.post(`${serverIp}/api/getBackendStatus`),
@@ -73,17 +75,20 @@ export const CtxProvider = ({ children }) => {
           setTags(responses[5].data.result.map((val) => ({ id: val[0], name: val[1], device: val[2], var: val[3], parent_tag: val[4], type_field: val[5], um: val[6], logic_state: val[7], comment: val[8], value: val[9] })));
           addMessage({ children: responses[5].data.message });
       
-          setDevices(responses[6].data.result.map((val) => ({ id: val[0], name: val[1], template: val[2], status: val[3], utc_offset: val[4] })));
+          setUsers(responses[6].data.result.map((val) => ({ id: val[0], name: val[1], email: val[2], role: val[3] })));
           addMessage({ children: responses[6].data.message });
       
-          setTemplates(responses[7].data.result.map((val) => ({ id: val[0], name: val[1] })));
+          setDevices(responses[7].data.result.map((val) => ({ id: val[0], name: val[1], user_id: val[2], template: val[3], status: val[4], utc_offset: val[5] })));
           addMessage({ children: responses[7].data.message });
       
-          setControls(responses[8].data.result);
+          setTemplates(responses[8].data.result.map((val) => ({ id: val[0], name: val[1] })));
           addMessage({ children: responses[8].data.message });
       
-          setBackendStatus(prevStatus => ({ ...prevStatus, backendConnected: socket.connected, dbConnected: responses[9].data.result.dbConnected, mqttConnected: responses[9].data.result.mqttConnected }));
+          setControls(responses[9].data.result);
           addMessage({ children: responses[9].data.message });
+      
+          setBackendStatus(prevStatus => ({ ...prevStatus, backendConnected: socket.connected, dbConnected: responses[10].data.result.dbConnected, mqttConnected: responses[10].data.result.mqttConnected }));
+          addMessage({ children: responses[10].data.message });
 
           setInit(true);
       
@@ -118,8 +123,6 @@ export const CtxProvider = ({ children }) => {
       const value = args[0]
 
       
-
-      //console.log("value: ", value)
       switch(value.table){
         //Type
         case "Type":
@@ -265,6 +268,30 @@ export const CtxProvider = ({ children }) => {
           }
           break
 
+        //Users
+        case "User":
+          switch(value.operation){
+            case 'INSERT':
+              setUsers(prevUsers => [...prevUsers, value.data])
+              break
+
+            case 'DELETE':
+              setUsers(prevUsers => [...prevUsers.filter(i => i.id !== value.data.id)])
+              break
+
+            case 'TRUNCATE':
+              setUsers(prevUsers => [...[]])
+              break
+
+            case 'UPDATE':
+              setUsers(prevUsers => [...prevUsers.map(i => { return i.id === value.data.id ? value.data : i })])
+              break
+              
+            default:
+              break
+          }
+          break
+
         //Devices
         case "Device":
           switch(value.operation){
@@ -393,11 +420,11 @@ export const CtxProvider = ({ children }) => {
       socket.off('mqttConnected', on_mqtt_connected)
       socket.off('mqttDisconnected', on_mqtt_disconnected)
     }
-  }, [serverIp, addMessage, init, backendStatus, logicStates, socket, types, fields, ums, vars, tags, devices, templates, controls])
+  }, [serverIp, addMessage, init, backendStatus, logicStates, socket, types, fields, ums, vars, tags, users, devices, templates, controls])
 
   const value = useMemo(
-    () => ({ init, setInit, backendStatus, setBackendStatus, types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags, devices, setDevices, templates, setTemplates, controls, setControls }),
-    [init, setInit, backendStatus, setBackendStatus, types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags, devices, setDevices, templates, setTemplates, controls, setControls]
+    () => ({ init, setInit, backendStatus, setBackendStatus, types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags, users, setUsers, devices, setDevices, templates, setTemplates, controls, setControls }),
+    [init, setInit, backendStatus, setBackendStatus, types, setTypes, fields, setFields, ums, setUms, logicStates, setLogicStates, vars, setVars, tags, setTags, users, setUsers, devices, setDevices, templates, setTemplates, controls, setControls]
   );
 
   return (

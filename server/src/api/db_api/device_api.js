@@ -22,6 +22,8 @@ export default function (app, pool) {
    * @param {Object} req.body - Il corpo della richiesta.
    * @param {number} req.body.id - L'ID del dispositivo da modificare.
    * @param {string} req.body.name - Il nuovo nome del dispositivo.
+   * @param {number} req.body.template - Il nuovo template del dispositivo.
+   * @param {number} req.body.user_id - Il nuovo user_id del dispositivo.
    * @param {Object} res - La risposta HTTP.
    * @returns {Object} - Un messaggio di conferma.
    */
@@ -37,7 +39,7 @@ export default function (app, pool) {
   // Aggiungi un dispositivo (solo admin)
   app.post('/api/addDevice', isAdmin, (req, res) => {
     console.log(req.body)
-    const queryString = `INSERT INTO "Device" (id, name, template, status) VALUES (DEFAULT, '${req.body.name}', '${req.body.template}', 0) RETURNING id`;
+    const queryString = `INSERT INTO "Device" (id, name, user_id, template, status) VALUES (DEFAULT, '${req.body.name}', ${req.body.user_id}, '${req.body.template}', 0) RETURNING id`;
     pool.query({
       text: queryString,
       rowMode: 'array'
@@ -52,13 +54,15 @@ export default function (app, pool) {
 
   // Modifica un dispositivo (solo admin)
   app.post('/api/modifyDevice', isAdmin, (req, res) => {
-    const queryString = `UPDATE "Device" SET name = '${req.body.name}' WHERE id = ${req.body.id}`;
+    const { id, name, template, user_id } = req.body;
+    const queryString = `UPDATE "Device" SET name = $1, template = $2, user_id = $3 WHERE id = $4 RETURNING *`;
     pool.query({
       text: queryString,
-      rowMode: 'array'
+      values: [name, template, user_id, id]
     })
     .then(data => {
       globalEventEmitter.emit('deviceUpdated')
+      globalEventEmitter.emit('refreshTags', { deviceId: id })
       res.json({ result: data.rows[0], message: "Device updated" })
     })
     .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
