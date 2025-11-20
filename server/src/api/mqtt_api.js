@@ -9,7 +9,7 @@ export default function (app, pool) {
 
   let devices = []
 
-  mqttClient = mqtt.connect("mqtt://mosquitto:1883", {
+  mqttClient = mqtt.connect("mqtt://www.stecape.space:1883", {
     clientId: mqtt_client_id, // Opzionale: identificativo del client
     clean: true, // Opzionale: indica se il broker deve mantenere lo stato del client
   })
