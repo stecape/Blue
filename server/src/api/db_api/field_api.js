@@ -2,6 +2,37 @@ import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
 import { isAdmin } from '../auth_api.js';
 
 export default function (app, pool) {
+  /*
+  Add a Field
+  Type:   POST
+  Route:  '/api/addField'
+  Body:   {
+            name, type, parent_type, fixed_id, um, logic_state, comment
+          }
+  */
+  app.post('/api/addField', isAdmin, (req, res) => {
+    const { name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
+    const queryString = `INSERT INTO "Field" (name, type, parent_type, fixed_id, um, logic_state, comment) VALUES ('${name}', ${type}, ${parent_type}, ${fixed_id}, ${um}, ${logic_state}, '${comment}') RETURNING id`;
+    pool.query({ text: queryString, rowMode: 'array' })
+      .then(data => res.json({ result: data.rows, message: "Field added" }))
+      .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
+  });
+
+  /*
+  Modify a Field
+  Type:   POST
+  Route:  '/api/modifyField'
+  Body:   {
+            id, name, type, parent_type, fixed_id, um, logic_state, comment
+          }
+  */
+  app.post('/api/modifyField', isAdmin, (req, res) => {
+    const { id, name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
+    const queryString = `UPDATE "Field" SET name = '${name}', type = ${type}, parent_type = ${parent_type}, fixed_id = ${fixed_id}, um = ${um}, logic_state = ${logic_state}, comment = '${comment}' WHERE id = ${id}`;
+    pool.query({ text: queryString, rowMode: 'array' })
+      .then(data => res.json({ result: data.rows, message: "Field updated" }))
+      .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
+  });
 
   // DFS function to traverse the graph and find all dependencies
   // It uses a depth counter to keep track of the depth of the recursion
@@ -65,9 +96,10 @@ export default function (app, pool) {
             name: field[1],
             type: field[2],
             parent_type: field[3],
-            um: field[4],
-            logic_state: field[5],
-            comment: field[6],
+            fixed_id: field[4],
+            um: field[5],
+            logic_state: field[6],
+            comment: field[7],
             QRef: i,
           }));
           /*

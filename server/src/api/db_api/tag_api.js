@@ -32,29 +32,36 @@ export default function (app, pool) {
     });
   };
 
-  const _GenerateTags = (varId, deviceId, name, type, typesList, fieldsList, parent_tag) => {
+  const _GenerateTags = (varId, deviceId, name, type, typesList, fieldsList, parent_tag, fixedIdPath = []) => {
   
     // Filtra i campi figli per il tipo corrente
     const childFields = fieldsList.filter((field) => field[3] === type);
-  
-    // Verifica che childFields sia un array
+
     if (!Array.isArray(childFields) || childFields.length === 0) {
       console.error("No child fields found or fieldsList is not an array for type:", type);
       return;
     }
-  
-    // Itera attraverso i campi e genera le tag
+
     childFields.forEach((f) => {
       const tagName = `${name}.${f[1]}`;
+      // Costruisci la path dei fixed_id (Var + Field)
+      const newFixedIdPath = [...fixedIdPath, f[4]];
+      // Genera il fixed_id gerarchico: array di fixed_id in base 7, padding a 18 cifre
+      let fixedIdStr = newFixedIdPath.map(id => id.toString(7).padStart(2, '0')).join('');
+      fixedIdStr = fixedIdStr.padEnd(18, '0');
+      // Converti la stringa in base 7 in uint64
+      let fixedIdValue = BigInt(parseInt(fixedIdStr, 7));
+      
       const queryString = `
-        INSERT INTO "Tag" (id, name, device, var, parent_tag, type_field, um, logic_state, comment)
+        INSERT INTO "Tag" (id, name, device, var, parent_tag, type_field, fixed_id, um, logic_state, comment)
         VALUES (DEFAULT, '${tagName}', ${deviceId}, ${varId}, ${parent_tag}, ${f[0]},
-          ${f[4] !== undefined ? f[4] : 'NULL'},
+          ${fixedIdValue},
           ${f[5] !== undefined ? f[5] : 'NULL'},
-          ${f[6] !== undefined ? `'${f[6]}'` : 'NULL'})
+          ${f[6] !== undefined ? f[6] : 'NULL'},
+          ${f[7] !== undefined ? `'${f[7]}'` : 'NULL'})
         RETURNING "id"
       `;
-  
+      console.log("Executing query:", queryString);
       pool.query({
         text: queryString,
         rowMode: 'array',
@@ -62,10 +69,8 @@ export default function (app, pool) {
         .then((data) => {
           const newParentTagId = data.rows[0][0];
           const _base_type = typesList.find((i) => i[0] === f[2])?.[2];
-  
-          // Se il campo è un tipo complesso, chiama ricorsivamente _GenerateTags
           if (!_base_type) {
-            _GenerateTags(varId, deviceId, tagName, f[2], typesList, fieldsList, newParentTagId);
+            _GenerateTags(varId, deviceId, tagName, f[2], typesList, fieldsList, newParentTagId, newFixedIdPath);
           }
         })
         .catch((error) => {
@@ -110,7 +115,7 @@ export default function (app, pool) {
           deviceIds = deviceData.rows.map((row) => row[0]);
 
           // Recupera tutte le variabili, i tipi e i campi
-          const varsQuery = `SELECT id, name, type, template, um, logic_state, comment FROM "Var"`;
+          const varsQuery = `SELECT id, name, type, template, fixed_id, um, logic_state, comment FROM "Var"`;
           const typesQuery = `SELECT * FROM "Type"`;
           const fieldsQuery = `SELECT * FROM "Field"`;
 
@@ -154,12 +159,17 @@ export default function (app, pool) {
               const varId = v[0];
               const varName = v[1];
               const varType = v[2];
-              const varUm = v[4];
-              const varLogicState = v[5];
-              const varComment = v[6];
+              const varTemplate = v[3];
+              const varFixedId = v[4];
+              const varUm = v[5];
+              const varLogicState = v[6];
+              const varComment = v[7];
+              // Genera il fixed_id gerarchico iniziale (Var)
+              let fixedIdStr = varFixedId.toString(7).padStart(2, '0').padEnd(22, '0');
+              let fixedIdValue = BigInt(parseInt(fixedIdStr, 7));
 
               // Inserisce la prima tag associata alla variabile
-              const insertQuery = `INSERT INTO "Tag" (id, name, device, var, parent_tag, type_field, um, logic_state, comment) VALUES (DEFAULT, '${varName}', ${currentDeviceId}, ${varId}, NULL, NULL, ${varUm !== undefined ? varUm : 'NULL'}, ${varLogicState !== undefined ? varLogicState : 'NULL'}, ${varComment !== undefined ? `'${varComment}'` : 'NULL'}) RETURNING "id"`;
+              const insertQuery = `INSERT INTO "Tag" (id, name, device, var, parent_tag, type_field, um, logic_state, comment, fixed_id) VALUES (DEFAULT, '${varName}', ${currentDeviceId}, ${varId}, NULL, NULL, ${varUm !== undefined ? varUm : 'NULL'}, ${varLogicState !== undefined ? varLogicState : 'NULL'}, ${varComment !== undefined ? `'${varComment}'` : 'NULL'}, ${fixedIdValue}) RETURNING "id"`;
               return pool.query({
                 text: insertQuery,
                 rowMode: 'array',
@@ -167,10 +177,8 @@ export default function (app, pool) {
                 .then((insertData) => {
                   const parentTagId = insertData.rows[0][0];
                   const _base_type = typesList.find((i) => i[0] === varType)?.[2];
-
-                  // Se non è un tipo base, genera le sottotag
                   if (!_base_type) {
-                    _GenerateTags(varId, currentDeviceId, varName, varType, typesList, fieldsList, parentTagId);
+                    _GenerateTags(varId, currentDeviceId, varName, varType, typesList, fieldsList, parentTagId, [varFixedId]);
                   }
                 });
             });

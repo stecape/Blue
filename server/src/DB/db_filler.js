@@ -42,6 +42,7 @@ export default function (client) {
       name text COLLATE pg_catalog."default" NOT NULL,
       type integer NOT NULL,
       parent_type integer NOT NULL,
+      fixed_id integer,
       um integer,
       logic_state integer,
       comment text COLLATE pg_catalog."default"
@@ -59,7 +60,8 @@ export default function (client) {
       um integer,
       logic_state integer,
       comment text COLLATE pg_catalog."default",
-      value json
+      value json,
+      fixed_id bigint
     );
     
 
@@ -87,6 +89,7 @@ export default function (client) {
       type integer NOT NULL,
       name text COLLATE pg_catalog."default" NOT NULL,
       template integer NOT NULL,
+      fixed_id integer,
       um integer,
       logic_state integer,
       comment text COLLATE pg_catalog."default"
@@ -120,6 +123,12 @@ export default function (client) {
     CREATE UNIQUE INDEX ui_field_name_and_parent_type 
       ON public."Field" (name, parent_type);
 
+    CREATE UNIQUE INDEX ui_field_parent_type_and_fixed_id 
+      ON public."Field" (parent_type, fixed_id);
+
+    CREATE UNIQUE INDEX ui_var_template_and_fixed_id 
+      ON public."Var" (template, fixed_id);
+
     ALTER TABLE IF EXISTS public."Field"
       DROP CONSTRAINT IF EXISTS field_type_id,
       ADD CONSTRAINT field_type_id FOREIGN KEY (type)
@@ -146,7 +155,9 @@ export default function (client) {
       ON DELETE NO ACTION
       NOT VALID,     
       DROP CONSTRAINT IF EXISTS unique_field_name_and_parent_type,
-      ADD CONSTRAINT unique_field_name_and_parent_type UNIQUE USING INDEX ui_field_name_and_parent_type;
+      ADD CONSTRAINT unique_field_name_and_parent_type UNIQUE USING INDEX ui_field_name_and_parent_type,
+      DROP CONSTRAINT IF EXISTS unique_field_parent_type_and_fixed_id,
+      ADD CONSTRAINT unique_field_parent_type_and_fixed_id UNIQUE USING INDEX ui_field_parent_type_and_fixed_id;
 
 
     CREATE UNIQUE INDEX ui_device_parent_tag_and_type_field 
@@ -225,7 +236,9 @@ export default function (client) {
       REFERENCES public."LogicState" (id) MATCH SIMPLE
       ON UPDATE CASCADE
       ON DELETE NO ACTION
-      NOT VALID;
+      NOT VALID,
+      DROP CONSTRAINT IF EXISTS unique_var_template_and_fixed_id,
+      ADD CONSTRAINT unique_var_template_and_fixed_id UNIQUE USING INDEX ui_var_template_and_fixed_id;
 
 
     ALTER TABLE IF EXISTS public."um"
@@ -319,31 +332,31 @@ export default function (client) {
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (14, 'LogicStatus', false, true) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "Type"(id,name,base_type, locked) VALUES (15, 'Alarm', false, true) ON CONFLICT (name) DO NOTHING;
 
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (1, 'InputValue', 1, 7, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (2, 'Value', 1, 7, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (3, 'HMIValue', 1, 8, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (4, 'Value', 1, 8, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (5, 'Min', 1, 9, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (6, 'Max', 1, 9, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (7, 'Set', 7, 10, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (8, 'Limit', 9, 10, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (9, 'Decimals', 3, 10, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (10, 'Init', 4, 10, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (11, 'Act', 8, 11, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (12, 'Limit', 9, 11, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (13, 'Decimals', 3, 11, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (14, 'Set', 7, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (15, 'Act', 8, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (16, 'Limit', 9, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (17, 'Decimals', 3, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (18, 'Init', 4, 12, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (19, 'Command', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (20, 'Status', 3, 13, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (21, 'Status', 3, 14, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (22, 'Status', 3, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (23, 'Reaction', 3, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (24, 'Ts', 6, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
-    INSERT INTO "Field"(id, name, type, parent_type, comment) VALUES (25, 'Q', 4, 15, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (1, 'InputValue', 1, 7, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (2, 'Value', 1, 7, 2, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (3, 'HMIValue', 1, 8, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (4, 'Value', 1, 8, 2, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (5, 'Min', 1, 9, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (6, 'Max', 1, 9, 2, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (7, 'Set', 7, 10, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (8, 'Limit', 9, 10, 2, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (9, 'Decimals', 3, 10, 3, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (10, 'Init', 4, 10, 4, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (11, 'Act', 8, 11, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (12, 'Limit', 9, 11, 2, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (13, 'Decimals', 3, 11, 3, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (14, 'Set', 7, 12, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (15, 'Act', 8, 12, 2, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (16, 'Limit', 9, 12, 3, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (17, 'Decimals', 3, 12, 4, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (18, 'Init', 4, 12, 5, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (19, 'Command', 3, 13, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (20, 'Status', 3, 13, 2, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (21, 'Status', 3, 14, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (22, 'Status', 3, 15, 1, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (23, 'Reaction', 3, 15, 2, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (24, 'Ts', 6, 15, 3, '') ON CONFLICT (name, parent_type) DO NOTHING;
+    INSERT INTO "Field"(id, name, type, parent_type, fixed_id, comment) VALUES (25, 'Q', 4, 15, 4, '') ON CONFLICT (name, parent_type) DO NOTHING;
     
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (1, 'm_ft', 'm', 'ft', 3.28084, 0) ON CONFLICT (name) DO NOTHING;
     INSERT INTO "um"(id, name, metric, imperial, gain, "offset") VALUES (2, '°C_°F', '°C', '°F', 1.8, 32) ON CONFLICT (name) DO NOTHING;

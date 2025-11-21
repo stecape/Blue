@@ -20,7 +20,9 @@ function ModifyVarPopup (props) {
     um: 0,
     logic_state: 0,
     comment: '',
+    fixed_id: 0,
     varNameNotValid: false,
+    fixedIdError: false,
   });
 
   // Input Validation
@@ -28,18 +30,45 @@ function ModifyVarPopup (props) {
     let pattern = /[^A-Za-z0-9_]|^[^A-Za-z_]/
     console.log("props: ", props)
     console.log("value: ", value)
-    setModalState((prevState) => ({ ...prevState, name: value, varNameNotValid: pattern.test(value) || props.vars.find(i => i.name === value && i.QRef !== props.QRef) || value === ""}))
+      setModalState((prevState) => ({ ...prevState, name: value, varNameNotValid: pattern.test(value) || props.vars.find(i => i.name === value && i.QRef !== props.QRef) || value === "" }));
   }
+
+    // Live fixed_id validation
+    const InlineFixedIdValidation = (value) => {
+      const intVal = parseInt(value, 10);
+      const isDuplicate = props.vars.some(i => Number(i.fixed_id) === intVal && i.QRef !== props.QRef);
+      const notValid = (
+        value === "" ||
+        isNaN(intVal) ||
+        intVal < 1 ||
+        intVal > 48 ||
+        isDuplicate
+      );
+      setModalState((prevState) => ({ ...prevState, fixed_id: value, fixedIdError: notValid }));
+    }
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault();
+    // Validazione fixed_id. Non possono partire da zero, altrimenti ci sono degli alias sulla prima tag (che avrebbe tutti zeri su tutti i livelli)
+    const intVal = parseInt(modalState.fixed_id, 10);
+    const isDuplicate = props.vars.some(i => Number(i.fixed_id) === intVal && i.QRef !== props.QRef);
+    const notValid = (
+      modalState.fixed_id === "" ||
+      isNaN(intVal) ||
+      intVal < 0 ||
+      intVal > 48 ||
+      isDuplicate
+    );
+    setModalState((prevState) => ({ ...prevState, fixedIdError: notValid }));
+    if (notValid) return;
     props.updVar({
       name: modalState.name,
       type: modalState.type,
       um: modalState.um,
       logic_state: modalState.logic_state,
       comment: modalState.comment,
+      fixed_id: modalState.fixed_id,
     });
   };
 
@@ -49,6 +78,7 @@ function ModifyVarPopup (props) {
   };
 
   useEffect(() => {
+    console.log("props", props)
     setModalState((prevState) => ({
       ...prevState,
       name: props.name,
@@ -56,9 +86,10 @@ function ModifyVarPopup (props) {
       um: props.um,
       logic_state: props.logic_state,
       comment: props.comment,
+      fixed_id: props.fixed_id,
       visible: props.visible,
     }));
-  }, [props.name, props.visible, props.type, props.um, props.logic_state, props.comment]);
+  }, [props.name, props.visible, props.type, props.um, props.logic_state, props.comment, props.fixed_id]);
 
   return (
     <Dialog
@@ -81,11 +112,23 @@ function ModifyVarPopup (props) {
               Modifying {modalState.name}:
             </Typography>
             <TextField
+              id="fixed-id"
+              key="fixed-id"
+              type="number"
+              label="Fixed ID"
+              value={modalState.fixed_id !== null && modalState.fixed_id !== undefined ? modalState.fixed_id : ""}
+                onChange={(e) => InlineFixedIdValidation(e.target.value)}
+              min={1}
+              max={48}
+              error={modalState.fixedIdError}
+              helpertext={modalState.fixedIdError ? "ID obbligatorio, intero tra 1 e 48, unico" : ""}
+            />
+            <TextField
               id="name"
               key="name"
               type="string"
               label="Var Name"
-              value={modalState.name}
+              value={modalState.name !== null && modalState.name !== undefined ? modalState.name : ""}
               onChange={(e) => InlineValidation(e.target.value)}
               error={modalState.varNameNotValid}
             />
@@ -96,7 +139,7 @@ function ModifyVarPopup (props) {
                 label: item.name,
                 value: item.id,
               }))}
-              value={modalState.type.toString()}
+              value={modalState.type !== null && modalState.type !== undefined ? modalState.type.toString() : "0"}
               label="Type"
               onChange={(value) =>
                 setModalState((prevState) => ({
@@ -112,7 +155,7 @@ function ModifyVarPopup (props) {
                 label: item.name,
                 value: item.id,
               }))}
-              value={modalState.um !== null ? modalState.um.toString() : 0}
+              value={modalState.um !== null && modalState.um !== undefined ? modalState.um.toString() : "0"}
               placeholder="Choose..."
               label="um"
               onChange={(value) =>
@@ -129,7 +172,7 @@ function ModifyVarPopup (props) {
                 label: item.name,
                 value: item.id,
               }))}
-              value={modalState.logic_state !== null ? modalState.logic_state.toString() : 0}
+              value={modalState.logic_state !== null && modalState.logic_state !== undefined ? modalState.logic_state.toString() : "0"}
               placeholder="Choose..."
               label="Logic state"
               onChange={(value) =>
@@ -144,7 +187,7 @@ function ModifyVarPopup (props) {
               key="comment"
               type="string"
               label="Var Comment"
-              value={modalState.comment}
+              value={modalState.comment !== null && modalState.comment !== undefined ? modalState.comment : ""}
               onChange={(e) =>
                 setModalState((prevState) => ({
                   ...prevState,

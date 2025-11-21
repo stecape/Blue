@@ -13,8 +13,8 @@ import formStyles from '../../../styles/Form.module.scss'
 
 function NewField () {
   const ctx = useContext(ctxData)
-  const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [name, setName] = useState("")
+  const {upsertType, setUpsertType} = useContext(UpsertTypeContext)
   const [type, setType] = useState(0)
   const [um, setUm] = useState(0)
   const [logic_state, setLogicState] = useState(0)
@@ -38,6 +38,26 @@ function NewField () {
     }))
   }
 
+  // fixed_id state and validation Non possono partire da zero, altrimenti ci sono degli alias sulla prima tag (che avrebbe tutti zeri su tutti i livelli)
+  const [fixedId, setFixedId] = useState("");
+  const [fixedIdNotValid, setFixedIdNotValid] = useState(false);
+  const InlineFixedIdValidation = (value) => {
+    setFixedId(value);
+    let valid = true;
+    const intVal = Number(value);
+    // Check integer
+    if (!Number.isInteger(intVal) || value === "") valid = false;
+    // Check range
+    if (intVal < 1 || intVal > 48) valid = false;
+    // Check uniqueness in upsertType.fields
+    if (upsertType.fields.find(i => i.fixed_id === intVal)) valid = false;
+    setFixedIdNotValid(!valid);
+    setUpsertType((prevState) => ({
+      ...prevState,
+      fixedIdNotValid: !valid
+    }));
+  }
+
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -48,14 +68,15 @@ function NewField () {
     setUpsertType((prevState) => ({
       ...prevState, 
       fieldNameNotValid: fieldNameNotValid,
-      fieldTypeNotValid: fieldTypeNotValid
+      fieldTypeNotValid: fieldTypeNotValid,
+      fixedIdNotValid: fixedIdNotValid
     }))
-    if (!fieldNameNotValid && !fieldTypeNotValid){
+    if (!fieldNameNotValid && !fieldTypeNotValid && !fixedIdNotValid){
       var QRef = Date.now()
       setUpsertType((prevState) => ({
         ...prevState, 
-        fields: [...upsertType.fields, { type: type, name: name, um: um, logic_state: logic_state, comment: comment, QRef: QRef }],
-        insertQuery: [...upsertType.insertQuery, {query: `INSERT into "Field" (id, name, type, um, logic_state, comment, parent_type) VALUES (DEFAULT, '${name}', ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, ${comment !== null ? `'${comment}'` : ''}, typeId);`, QRef: QRef}]}), handleReset()
+        fields: [...upsertType.fields, { type: type, name: name, um: um, logic_state: logic_state, comment: comment, fixed_id: Number(fixedId), QRef: QRef }],
+        insertQuery: [...upsertType.insertQuery, {query: `INSERT into "Field" (id, name, type, um, logic_state, comment, fixed_id, parent_type) VALUES (DEFAULT, '${name}', ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, ${comment !== null ? `'${comment}'` : ''}, ${Number(fixedId)}, typeId);`, QRef: QRef}]}), handleReset()
       )
     }
   }
@@ -82,6 +103,20 @@ function NewField () {
           value={name}
           onChange={(e) => InlineNameValidation(e.target.value)}
           error={upsertType.fieldNameNotValid}
+        />
+        <TextField
+          id='field-fixed-id'
+          key='field-fixed-id'
+          type='number'
+          label="Fixed ID"
+          className={formStyles.item}
+          value={fixedId}
+          onChange={(e) => InlineFixedIdValidation(e.target.value)}
+          error={fixedIdNotValid}
+          min={1}
+          max={48}
+          required
+          helpertext={fixedIdNotValid ? "ID must be integer, 1–48, unique" : ""}
         />
         <Select
           id='field-type1'

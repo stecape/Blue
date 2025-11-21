@@ -31,6 +31,7 @@ export default function (app, pool) {
     var varUm = req.body.um;
     var varLogicState = req.body.logic_state;
     var varComment = req.body.comment;
+    var varFixedId = req.body.fixed_id;
 
     // Retreiving the typesList
     var queryString = `SELECT * from "Type"`;
@@ -50,7 +51,7 @@ export default function (app, pool) {
       .then(data => {
         fieldsList = data.rows;
         // Inserting the Var
-        queryString = `INSERT INTO "Var" (id, name, template, type, um, logic_state, comment) VALUES (DEFAULT, '${varName}', '${varTemplate}', ${varType}, ${varUm}, ${varLogicState}, '${varComment}') RETURNING "id"`;
+        queryString = `INSERT INTO "Var" (id, name, template, type, um, logic_state, comment, fixed_id) VALUES (DEFAULT, '${varName}', '${varTemplate}', ${varType}, ${varUm}, ${varLogicState}, '${varComment}', ${varFixedId}) RETURNING "id"`;
         return pool.query({
           text: queryString,
           rowMode: 'array',
@@ -92,6 +93,7 @@ export default function (app, pool) {
     var varUm = req.body.um;
     var varLogicState = req.body.logic_state;
     var varComment = req.body.comment;
+    var varFixedId = req.body.fixed_id;
 
     // Retreiving the typesList
     var queryString = `SELECT * from "Type"`;
@@ -111,7 +113,7 @@ export default function (app, pool) {
       .then(data => {
         fieldsList = data.rows;
         // Updating the Var
-        queryString = `UPDATE "Var" SET name = '${varName}', template = '${varTemplate}', type = ${varType}, um = ${varUm}, logic_state = ${varLogicState}, comment = '${varComment}' WHERE id = ${req.body.id}`;
+        queryString = `UPDATE "Var" SET name = '${varName}', template = '${varTemplate}', type = ${varType}, um = ${varUm}, logic_state = ${varLogicState}, comment = '${varComment}', fixed_id = ${varFixedId} WHERE id = ${req.body.id}`;
         return pool.query({
           text: queryString,
           rowMode: 'array',
@@ -184,9 +186,10 @@ export default function (app, pool) {
           type: va[1],
           name: va[2],
           template: va[3],
-          um: va[4],
-          logic_state: va[5],
-          comment: va[6],
+          fixed_id: va[4],
+          um: va[5],
+          logic_state: va[6],
+          comment: va[7],
           QRef: i,
         }));
 

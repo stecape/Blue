@@ -43,11 +43,11 @@ export const CtxProvider = ({ children }) => {
           console.log("trying to retrieve data")
           const requests = [
             axios.post(`${serverIp}/api/getAll`, { table: "Type", fields: ["name", "id", "base_type", "locked"] }),
-            axios.post(`${serverIp}/api/getAll`, { table: "Field", fields: ['id', 'name', 'type', 'parent_type', 'um', 'logic_state', 'comment'] }),
+            axios.post(`${serverIp}/api/getAll`, { table: "Field", fields: ['id', 'name', 'type', 'parent_type', 'um', 'logic_state', 'comment', 'fixed_id'] }),
             axios.post(`${serverIp}/api/getAll`, { table: "um", fields: ['id', 'name', 'metric', 'imperial', 'gain', '"offset"'] }),
             axios.post(`${serverIp}/api/getAll`, { table: "LogicState", fields: ['id', 'name', 'value'] }),
-            axios.post(`${serverIp}/api/getAll`, { table: "Var", fields: ['id', 'name', 'template', 'type', 'um', 'logic_state', 'comment'] }),
-            axios.post(`${serverIp}/api/getAll`, { table: "Tag", fields: ['id', 'name', 'device', 'var', 'parent_tag', 'type_field', 'um', 'logic_state', 'comment', 'value'] }),
+            axios.post(`${serverIp}/api/getAll`, { table: "Var", fields: ['id', 'name', 'template', 'type', 'um', 'logic_state', 'comment', 'fixed_id'] }),
+            axios.post(`${serverIp}/api/getAll`, { table: "Tag", fields: ['id', 'name', 'device', 'var', 'parent_tag', 'type_field', 'um', 'logic_state', 'comment', 'value', 'fixed_id'] }),
             axios.post(`${serverIp}/api/getAll`, { table: "User", fields: ['id', 'name', 'email', 'role'] }),
             axios.post(`${serverIp}/api/getAll`, { table: "Device", fields: ['id', 'name', 'user_id', 'template', 'status', 'utc_offset'] }),
             axios.post(`${serverIp}/api/getAll`, { table: "Template", fields: ['id', 'name'] }),
@@ -60,7 +60,7 @@ export const CtxProvider = ({ children }) => {
           setTypes(responses[0].data.result.map((val) => ({ name: val[0], id: val[1], base_type: val[2], locked: val[3] })));
           addMessage({ children: responses[0].data.message });
       
-          setFields(responses[1].data.result.map((val) => ({ id: val[0], name: val[1], type: val[2], parent_type: val[3], um: val[4], logic_state: val[5], comment: val[6] })));
+          setFields(responses[1].data.result.map((val) => ({ id: val[0], name: val[1], type: val[2], parent_type: val[3], um: val[4], logic_state: val[5], comment: val[6], fixed_id: val[7] })));
           addMessage({ children: responses[1].data.message });
       
           setUms(responses[2].data.result.map((val) => ({ id: val[0], name: val[1], metric: val[2], imperial: val[3], gain: val[4], offset: val[5] })));
@@ -69,10 +69,10 @@ export const CtxProvider = ({ children }) => {
           setLogicStates(responses[3].data.result.map((val) => ({ id: val[0], name: val[1], value: val[2] })));
           addMessage({ children: responses[3].data.message });
       
-          setVars(responses[4].data.result.map((val) => ({ id: val[0], name: val[1], template: val[2], type: val[3], um: val[4], logic_state: val[5], comment: val[6] })));
+          setVars(responses[4].data.result.map((val) => ({ id: val[0], name: val[1], template: val[2], type: val[3], um: val[4], logic_state: val[5], comment: val[6], fixed_id: val[7] })));
           addMessage({ children: responses[4].data.message });
       
-          setTags(responses[5].data.result.map((val) => ({ id: val[0], name: val[1], device: val[2], var: val[3], parent_tag: val[4], type_field: val[5], um: val[6], logic_state: val[7], comment: val[8], value: val[9] })));
+          setTags(responses[5].data.result.map((val) => ({ id: val[0], name: val[1], device: val[2], var: val[3], parent_tag: val[4], type_field: val[5], um: val[6], logic_state: val[7], comment: val[8], value: val[9], fixed_id: val[10] })));
           addMessage({ children: responses[5].data.message });
       
           setUsers(responses[6].data.result.map((val) => ({ id: val[0], name: val[1], email: val[2], role: val[3] })));

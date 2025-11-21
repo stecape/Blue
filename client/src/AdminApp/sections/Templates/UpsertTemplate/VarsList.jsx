@@ -19,7 +19,7 @@ function VarsList () {
   const ctx = useContext(ctxData)
   const {upsertTemplate, setUpsertTemplate} = useContext(UpsertTemplateContext)
   const [deletePopup, setDeletePopup] = useState({ visible: false, id: 0, name: '' })
-  const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, type: 0, um: 0, logic_state: 0, comment: '', name: '', QRef: undefined })
+  const [modifyVarPopup, setModifyVarPopup] = useState({ visible: false, type: 0, um: 0, logic_state: 0, comment: '', name: '', fixed_id: '', QRef: undefined })
 
   const updateVar = (data)=>{
     //we retreive the var to update object from the array of the fileds and his index,
@@ -33,6 +33,7 @@ function VarsList () {
     varToUpdate.um = data.um
     varToUpdate.logic_state = data.logic_state
     varToUpdate.comment = data.comment
+    varToUpdate.fixed_id = data.fixed_id
     var vars = upsertTemplate.vars
     vars[varToUpdateIndex] = varToUpdate
 
@@ -50,14 +51,14 @@ function VarsList () {
           ...prevState,
           updateQuery: [
             ...upsertTemplate.updateQuery, 
-            {query: `UPDATE "Var" SET name='${data.name}', template=${varToUpdate.template}, type=${data.type}, um=${data.um}, logic_state=${data.logic_state}, comment='${data.comment}' WHERE name = '${modifyVarPopup.name}' AND template = templateId;`, QRef: varToUpdate.QRef}
+            {query: `UPDATE "Var" SET name='${data.name}', template=${varToUpdate.template}, type=${data.type}, um=${data.um}, logic_state=${data.logic_state}, comment='${data.comment}', fixed_id=${data.fixed_id} WHERE name = '${modifyVarPopup.name}' AND template = templateId;`, QRef: varToUpdate.QRef}
           ],
           vars: vars
         }), setModifyVarPopup((prevState) => ({ ...prevState, visible: false })))
       } else {
         //the var is in the insert list. The var has been inserted this round, so it is possible to update the insert query
         newQuery = upsertTemplate.insertQuery
-        newQuery[newQuery.findIndex(i => i.QRef===varToUpdate.QRef)] = {query: `INSERT INTO "Var" (id, name, template, type, um, logic_state, comment) VALUES (DEFAULT, '${varToUpdate.name}', ${varToUpdate.template}, ${varToUpdate.type}, ${varToUpdate.um}, ${varToUpdate.logic_state}, '${varToUpdate.comment}');`, QRef: varToUpdate.QRef} 
+        newQuery[newQuery.findIndex(i => i.QRef===varToUpdate.QRef)] = {query: `INSERT INTO "Var" (id, name, template, type, um, logic_state, comment, fixed_id) VALUES (DEFAULT, '${varToUpdate.name}', ${varToUpdate.template}, ${varToUpdate.type}, ${varToUpdate.um}, ${varToUpdate.logic_state}, '${varToUpdate.comment}', ${varToUpdate.fixed_id});`, QRef: varToUpdate.QRef} 
         setUpsertTemplate((prevState) => ({
           ...prevState,
           insertQuery: newQuery,
@@ -67,7 +68,7 @@ function VarsList () {
       //the var is already in the update list. It is a preexisting var (not in the insert list) that has been already modified this round.
       //It is possible to update the update query
       newQuery = upsertTemplate.updateQuery
-      newQuery[newQuery.findIndex(i => i.QRef===varToUpdate.QRef)] = {query: `UPDATE "Var" SET name='${varToUpdate.name}', template=${varToUpdate.template}, type=${varToUpdate.type}, um=${varToUpdate.um}, logic_state=${varToUpdate.logic_state}, comment='${varToUpdate.comment}' WHERE name = '${modifyVarPopup.name}' AND template = templateId;`, QRef: varToUpdate.QRef}
+      newQuery[newQuery.findIndex(i => i.QRef===varToUpdate.QRef)] = {query: `UPDATE "Var" SET name='${varToUpdate.name}', template=${varToUpdate.template}, type=${varToUpdate.type}, um=${varToUpdate.um}, logic_state=${varToUpdate.logic_state}, comment='${varToUpdate.comment}', fixed_id=${varToUpdate.fixed_id} WHERE name = '${modifyVarPopup.name}' AND template = templateId;`, QRef: varToUpdate.QRef}
       setUpsertTemplate((prevState) => ({
         ...prevState,
         updateQuery: newQuery,
@@ -103,6 +104,7 @@ function VarsList () {
         <Table fullWidth className={tableStyles.table}>
           <TableHeader>
             <TableRow>
+              <TableCell hAlign="center">Fixed ID</TableCell>
               <TableCell hAlign="left" grow >Name</TableCell>
               <TableCell hAlign="center">Type</TableCell>
               <TableCell hAlign="center">um</TableCell>
@@ -113,6 +115,7 @@ function VarsList () {
           </TableHeader>
           <TableBody>
             {upsertTemplate.vars.map((item) => {
+                console.log(item)
                 var typeItem = ctx.types.find(i => i.id === item.type)
                 var umItem = ctx.ums.find(i => i.id === item.um)
                 var logic_stateItem = ctx.logicStates.find(i => i.id === item.logic_state)
@@ -120,6 +123,7 @@ function VarsList () {
                   <TableRow
                     key={item.id}
                   >
+                    <TableCell className={tableStyles.cell}>{item.fixed_id !== undefined ? item.fixed_id : ''}</TableCell>
                     <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                     <TableCell className={tableStyles.cell}>{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
                     <TableCell className={tableStyles.cell}>{umItem !== undefined && item.um !== 0 && item.um !== null && umItem.name}</TableCell>
@@ -139,7 +143,7 @@ function VarsList () {
                         id="icon-button-5"
                         buttonType="icon"
                         aria-label="Edit"
-                        onClick={() => setModifyVarPopup({visible: true, type: item.type, um: item.um, logic_state: item.logic_state, comment: item.comment, name: item.name, QRef: item.QRef})}
+                        onClick={() => setModifyVarPopup({visible: true, type: item.type, um: item.um, logic_state: item.logic_state, comment: item.comment, name: item.name, fixed_id: item.fixed_id, QRef: item.QRef})}
                       >
                         <EditFontIcon />
                       </Button>
@@ -167,6 +171,7 @@ function VarsList () {
         um={modifyVarPopup.um}
         logic_state={modifyVarPopup.logic_state}
         comment={modifyVarPopup.comment}
+        fixed_id={modifyVarPopup.fixed_id}
         QRef={modifyVarPopup.QRef}
         typesList={upsertTemplate.typesList}
         vars={upsertTemplate.vars}

@@ -49,11 +49,11 @@ function TagsList () {
               umItem = ctx.ums.find(i => i.id === fieldItem.um)
               logic_stateItem = ctx.logicStates.find(i => i.id === fieldItem.logic_state)
             }
-
+              console.log(item)
               return (
                 <TableRow key={item.id}>
                   <TableCell className={tableStyles.cell} hAlign="left">{deviceItem !== undefined ? deviceItem.name : item.device}</TableCell>
-                  <TableCell className={tableStyles.cell} hAlign="center">{item.id}</TableCell>
+                  <TableCell className={tableStyles.cell} hAlign="center">{item.fixed_id}</TableCell>
                   <TableCell className={tableStyles.cell} hAlign="left">{item.name}</TableCell>
                   <TableCell className={tableStyles.cell} hAlign="center">{typeItem !== undefined ? typeItem.name : item.type}</TableCell>
                   <TableCell className={tableStyles.cell} hAlign="center">{umItem !== undefined && umItem.name}</TableCell>

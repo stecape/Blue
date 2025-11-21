@@ -12,18 +12,32 @@ import {ctxData} from "../../../Helpers/CtxProvider"
 
 function ModifyFieldPopup (props) {
   const ctx = useContext(ctxData)
-  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, um: 0, logic_state: 0, comment: '', fieldNameNotValid: false })
+  const [modalState, setModalState] = useState({ visible: false, name: '', type: 0, um: 0, logic_state: 0, comment: '', fixed_id: '', fieldNameNotValid: false, fixedIdNotValid: false })
 
   //Input Validation
   const InlineValidation = (value) => {
     let pattern = /[^A-Za-z0-9\-_<> ]/g
     setModalState((prevState) => ({ ...prevState, name: value, fieldNameNotValid: pattern.test(value) || props.fields.find(i => i.name === value && i.QRef !== props.QRef) || value === ''}))
   }
+  // Fixed ID validation. Non possono partire da zero, altrimenti ci sono degli alias sulla prima tag (che avrebbe tutti zeri su tutti i livelli)
+  const InlineFixedIdValidation = (value) => {
+    let valid = true;
+    const intVal = Number(value);
+    // Check integer
+    if (!Number.isInteger(intVal) || value === "") valid = false;
+    // Check range
+    if (intVal < 1 || intVal > 48) valid = false;
+    // Check uniqueness in props.fields (excluding current QRef)
+    if (props.fields.find(i => i.fixed_id === intVal && i.QRef !== props.QRef)) valid = false;
+    setModalState((prevState) => ({ ...prevState, fixed_id: value, fixedIdNotValid: !valid }));
+  }
   
   //Form Events
   const handleSubmit = (event) => {
     event.preventDefault()
-    props.updField({name: modalState.name, type: modalState.type, um: modalState.um, logic_state: modalState.logic_state, comment: modalState.comment})
+    if (!modalState.fieldNameNotValid && !modalState.fixedIdNotValid) {
+      props.updField({name: modalState.name, type: modalState.type, um: modalState.um, logic_state: modalState.logic_state, comment: modalState.comment, fixed_id: Number(modalState.fixed_id)})
+    }
   }
   const handleReset = (event) => {
     event.preventDefault()
@@ -31,8 +45,8 @@ function ModifyFieldPopup (props) {
   }
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, comment: props.comment, visible: props.visible}))
-  },[props.name, props.visible, props.type, props.um, props.logic_state, props.comment])
+    setModalState((prevState) => ({ ...prevState, name: props.name, type: props.type, um: props.um, logic_state: props.logic_state, comment: props.comment, visible: props.visible, fixed_id: props.fixed_id }))
+  },[props.name, props.visible, props.type, props.um, props.logic_state, props.comment, props.fixed_id])
   
   return (
     <Dialog
@@ -62,6 +76,19 @@ function ModifyFieldPopup (props) {
               value={modalState.name}
               onChange={(e) => InlineValidation(e.target.value)}
               error={modalState.fieldNameNotValid}
+            />
+            <TextField
+              id='fixed-id'
+              key='fixed-id'
+              type='number'
+              label="Fixed ID"
+              value={modalState.fixed_id}
+              onChange={(e) => InlineFixedIdValidation(e.target.value)}
+              error={modalState.fixedIdNotValid}
+              min={1}
+              max={48}
+              required
+              helpertext={modalState.fixedIdNotValid ? "ID must be integer, 1–48, unique" : ""}
             />
             <Select
               id='type'

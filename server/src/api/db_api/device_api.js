@@ -39,7 +39,8 @@ export default function (app, pool) {
   // Aggiungi un dispositivo (solo admin)
   app.post('/api/addDevice', isAdmin, (req, res) => {
     console.log(req.body)
-    const queryString = `INSERT INTO "Device" (id, name, user_id, template, status) VALUES (DEFAULT, '${req.body.name}', ${req.body.user_id}, '${req.body.template}', 0) RETURNING id`;
+    const userIdValue = (req.body.user_id !== undefined && req.body.user_id !== null && req.body.user_id !== 0) ? req.body.user_id : 'NULL';
+    const queryString = `INSERT INTO "Device" (id, name, user_id, template, status) VALUES (DEFAULT, '${req.body.name}', ${userIdValue}, '${req.body.template}', 0) RETURNING id`;
     pool.query({
       text: queryString,
       rowMode: 'array'

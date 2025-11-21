@@ -71,7 +71,7 @@ export default function Home() {
     initTags.forEach(t => {
       let type = t.type_field !== null ? IsBaseType(t.type_field, ctx.fields, ctx.types).type : IsBaseType(v.id, ctx.vars, ctx.types).type
       structs.tagType.push(ctx.types.find(t => t.id === type).name.toUpperCase())
-      structs.tagId.push(t.id)
+      structs.tagId.push(t.fixed_id)
       structs.tagPointer.push(`(void*)&HMI.${t.name}`)
     })
   })
@@ -85,6 +85,7 @@ export default function Home() {
 
 #include "time.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 #define REAL 1
 #define INT 3
@@ -109,7 +110,7 @@ typedef struct {${structs.vars
 extern _HMI HMI;
 extern _HMI PLC;
 
-extern int id[${structs.tagId.length}];
+extern uint64_t id[${structs.tagId.length}];
 extern int type[${structs.tagType.length}];
 extern void *HMI_pointer[${structs.tagPointer.length}];
 extern void *PLC_pointer[${structs.tagPointer.length}];
@@ -202,7 +203,7 @@ ${structs.vars
   .join("")}
 };
 
-int id[${structs.tagId.length}] = {
+uint64_t id[${structs.tagId.length}] = {
 \t${structs.tagId.join(",\n\t")}
 };
 

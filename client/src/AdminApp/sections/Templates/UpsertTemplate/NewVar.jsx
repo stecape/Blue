@@ -14,11 +14,33 @@ import formStyles from '../../../styles/Form.module.scss'
 function NewVar () {
   const ctx = useContext(ctxData)
   const {upsertTemplate, setUpsertTemplate} = useContext(UpsertTemplateContext)
+  const [fixedId, setFixedId] = useState("");
+  const [fixedIdError, setFixedIdError] = useState(false);
   const [name, setName] = useState("")
   const [type, setType] = useState(0)
   const [um, setUm] = useState(0)
   const [logic_state, setLogicState] = useState(0)
   const [comment, setComment] = useState('')
+
+  // Validazione fixed_id. Non possono partire da zero, altrimenti ci sono degli alias sulla prima tag (che avrebbe tutti zeri su tutti i livelli)
+  const validateFixedId = (value) => {
+    const intVal = parseInt(value, 10);
+    const isDuplicate = upsertTemplate.vars.some(i => i.fixed_id === value);
+    const notValid = (
+      value === "" ||
+      isNaN(intVal) ||
+      intVal < 1 ||
+      intVal > 48 ||
+      isDuplicate
+    );
+    setFixedIdError(notValid);
+    return !notValid;
+  };
+
+  const handleFixedIdChange = (e) => {
+    setFixedId(e.target.value);
+    validateFixedId(e.target.value);
+  };
 
   //Input Validation
   const InlineNameValidation = (value) => {
@@ -40,23 +62,22 @@ function NewVar () {
 
   //Form Events
   const handleSubmit = (event) => {
-    event.preventDefault()
-    //it begins validating the input and then, if both type and name are valid, it proceed with the insert of the var and of the query
-    let pattern = /[^A-Za-z0-9_]|^[^A-Za-z_]/
-    var varNameNotValid = pattern.test(name) || upsertTemplate.vars.find(i => i.name === name) || name === ""
-    var varTypeNotValid = type === 0
+    event.preventDefault();
+    let pattern = /[^A-Za-z0-9_]|^[^A-Za-z_]/;
+    var varNameNotValid = pattern.test(name) || upsertTemplate.vars.find(i => i.name === name) || name === "";
+    var varTypeNotValid = type === 0;
     setUpsertTemplate((prevState) => ({
       ...prevState, 
       varNameNotValid: varNameNotValid,
       varTypeNotValid: varTypeNotValid
-    }))
-    if (!varNameNotValid && !varTypeNotValid){
-      var QRef = Date.now()
+    }));
+    if (!varNameNotValid && !varTypeNotValid && validateFixedId(fixedId)){
+      var QRef = Date.now();
       setUpsertTemplate((prevState) => ({
         ...prevState, 
-        vars: [...upsertTemplate.vars, { type: type, template: upsertTemplate.template, name: name, um: um, logic_state: logic_state, comment: comment, QRef: QRef}],
-        insertQuery: [...upsertTemplate.insertQuery, {query: `INSERT into "Var" (id, name, template, type, um, logic_state, comment) VALUES (DEFAULT, '${name}', templateId, ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, ${comment !== '' ? `'${comment}'` : 'NULL'});`, QRef: QRef}]}), handleReset()
-      )
+        vars: [...upsertTemplate.vars, { type: type, template: upsertTemplate.template, name: name, um: um, logic_state: logic_state, comment: comment, fixed_id: fixedId, QRef: QRef}],
+        insertQuery: [...upsertTemplate.insertQuery, {query: `INSERT into "Var" (id, name, template, type, um, logic_state, comment, fixed_id) VALUES (DEFAULT, '${name}', templateId, ${type}, ${um !== 0 ? um : 'NULL'}, ${logic_state !== 0 ? logic_state : 'NULL'}, ${comment !== '' ? `'${comment}'` : 'NULL'}, ${fixedId !== '' ? fixedId : 'NULL'});`, QRef: QRef}]}), handleReset()
+      );
     }
   }
 
@@ -67,12 +88,27 @@ function NewVar () {
     setUm(0)
     setLogicState(0)
     setComment('')
+    setFixedId("")
+    setFixedIdError(false);
   }
   
   return(
     <div className={formStyles.container}>
     <FormThemeProvider theme='outline'>
       <Form className={formStyles.form} onSubmit={handleSubmit}>
+        <TextField
+          id='fixed-id'
+          key='fixed-id'
+          type='number'
+          label="Fixed ID"
+          className={formStyles.item}
+          value={fixedId}
+          min={1}
+          max={48}
+          onChange={handleFixedIdChange}
+          error={fixedIdError}
+          helpertext={fixedIdError ? "ID obbligatorio, intero tra 1 e 48, unico" : ""}
+        />
         <TextField
           id='var-name'
           key='var-name'

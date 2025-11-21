@@ -202,14 +202,12 @@ export default function (app, pool) {
               }
             }
           } else {
-            // Update the value of the tag in the "Tag" table
-            const queryString = `UPDATE "Tag" SET value = '${JSON.stringify({ value: data.value })}' WHERE id = ${data.id}`;
-            //console.log(queryString);
+            // Update the value of the tag in the "Tag" table usando fixed_id
+            const queryString = `UPDATE "Tag" SET value = '${JSON.stringify({ value: data.value })}' WHERE fixed_id = ${data.id}`;
             pool.query({
               text: queryString,
               rowMode: 'array',
             });
-            //console.log(`Updated tag ${data.id} with value ${data.value}`);
           } 
         } else {
           console.error("Invalid data format received:", data);
