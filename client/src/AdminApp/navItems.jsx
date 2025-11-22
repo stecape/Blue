@@ -34,7 +34,10 @@ const navItems = {
   "/tags": createRoute("/tags", "Tags", <SettingsInputComponentFontIcon />),
   "/controls": createRoute("/controls", "Controls", <SettingsInputComponentFontIcon />),
   "/trend": createRoute("/trend", "Trend", <TrendSVGIcon />),
-  "/oven": createRoute("/oven", "Oven", <WhatshotSVGIcon />),
 };
 
 export default navItems;
+
+
+
+//  "/oven": createRoute("/oven", "Oven", <WhatshotSVGIcon />),

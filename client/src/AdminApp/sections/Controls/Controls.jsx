@@ -29,6 +29,9 @@ function Controls() {
         <GridCell colSpan={4} className={gridStyles.item}>
           <Act ctrl={pot["Moisture.AnalogicRead"]} />
         </GridCell>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <SetAct ctrl={pot["Light"]} />
+        </GridCell>
       </Grid>
       )}
     </>
