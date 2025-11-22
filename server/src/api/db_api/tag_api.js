@@ -46,12 +46,11 @@ export default function (app, pool) {
       const tagName = `${name}.${f[1]}`;
       // Costruisci la path dei fixed_id (Var + Field)
       const newFixedIdPath = [...fixedIdPath, f[4]];
-      // Genera il fixed_id gerarchico: array di fixed_id in base 7, padding a 18 cifre
       let fixedIdStr = newFixedIdPath.map(id => id.toString(7).padStart(2, '0')).join('');
       fixedIdStr = fixedIdStr.padEnd(18, '0');
-      // Converti la stringa in base 7 in uint64
-      let fixedIdValue = BigInt(parseInt(fixedIdStr, 7));
-      
+      // Converti la stringa in base 7 in uint64 (assumiamo sempre che rientri in Number)
+      let fixedIdValue = Number(BigInt(parseInt(fixedIdStr, 7)));
+
       const queryString = `
         INSERT INTO "Tag" (id, name, device, var, parent_tag, type_field, fixed_id, um, logic_state, comment)
         VALUES (DEFAULT, '${tagName}', ${deviceId}, ${varId}, ${parent_tag}, ${f[0]},

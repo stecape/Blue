@@ -9,7 +9,54 @@ import SetAct from "../../HMI/Components/SetAct/SetAct"
 
 function Controls() {
   const ctx = useContext(ctxData)
+  const pot = ctx.controls ? ctx.controls.Pot001 : null;
   return (
+    <>
+      {ctx.init && pot !== null && (
+      <Grid>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <Set ctrl={pot["Moisture.AnalogicMin"]} />
+        </GridCell>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <Set ctrl={pot["Moisture.AnalogicMax"]} />
+        </GridCell>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <Act ctrl={pot["Temperature"]} />
+        </GridCell>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <SetAct ctrl={pot["Moisture.Moisture"]} />
+        </GridCell>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <Act ctrl={pot["Moisture.AnalogicRead"]} />
+        </GridCell>
+      </Grid>
+      )}
+    </>
+  )
+}
+
+export default Controls
+
+/*
+<>
+{ctx.init && (
+  <Grid>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <LogicSelection ctrl={ctx.controls.Stefano.Light} />
+        </GridCell>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <Act ctrl={ctx.controls.Stefano.BatteryLevel} />
+        </GridCell>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <Set ctrl={ctx.controls.Stefano.Temperature} />
+        </GridCell>
+        <GridCell colSpan={4} className={gridStyles.item}>
+          <SetAct ctrl={ctx.controls.Stefano.Pressure} />
+        </GridCell>
+  </Grid>
+)}
+</>
+
     <>
       {ctx.init && (
       <Grid>
@@ -40,28 +87,5 @@ function Controls() {
       </Grid>
       )}
     </>
-  )
-}
-
-export default Controls
-
-/*
-<>
-{ctx.init && (
-  <Grid>
-        <GridCell colSpan={4} className={gridStyles.item}>
-          <LogicSelection ctrl={ctx.controls.Stefano.Light} />
-        </GridCell>
-        <GridCell colSpan={4} className={gridStyles.item}>
-          <Act ctrl={ctx.controls.Stefano.BatteryLevel} />
-        </GridCell>
-        <GridCell colSpan={4} className={gridStyles.item}>
-          <Set ctrl={ctx.controls.Stefano.Temperature} />
-        </GridCell>
-        <GridCell colSpan={4} className={gridStyles.item}>
-          <SetAct ctrl={ctx.controls.Stefano.Pressure} />
-        </GridCell>
-  </Grid>
-)}
-</>
+    
 */

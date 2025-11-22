@@ -81,8 +81,6 @@ function Trend() {
     if (!tag_type_field_type) return false; // Se non esiste il tipo di campo, salta questo tag
     return ctx.types.find(ty => ty.id === tag_type_field_type.type)?.base_type === true
   }) || [];
-console.log("Tags:", tags);
-console.log("Ctx.tags:", ctx.tags);
   // Gestione polling
   useEffect(() => {
     if (!isRecording || !selectedTag) return;

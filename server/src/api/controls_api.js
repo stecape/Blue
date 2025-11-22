@@ -184,13 +184,15 @@ export default function (app, pool) {
               name: tag[1],
               um: tag[6],
               logic_state: tag[7],
+              fixed_id: tag[10] !== null && tag[10] !== undefined ? Number(tag[10]) : null,
               comment: tag[8],
               fields: tags
                 .filter((t) => t[4] == tag[0])
                 .reduce((acc, _t) => {
                   const field = fields.find((f) => f[0] == _t[5]);
                   if (field) {
-                    acc[field[1]] = _t[0];
+                    //passo i fixed_id come riferimento per i field, così che l'mqtt utilizza questi per riferirsi alla tag in fase di scrittura verso ESP32
+                    acc[field[1]] = _t[10] !== null && _t[10] !== undefined ? Number(_t[10]) : null;
                   }
                   return acc;
                 }, {}),

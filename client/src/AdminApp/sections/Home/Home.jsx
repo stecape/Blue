@@ -58,16 +58,13 @@ export default function Home() {
               : ctx.types.find(t => t.id === v.type)?.name,
         };
       });
-      console.log(structs.vars)
   } else {
     structs.vars = []; // Se il device non è definito, structs.vars rimane vuoto
   }
 
-  console.log("device: ", device)
   structs.vars.forEach(v => {
     //le tag da inizializzare sono quelle la cui var è un tipo base oppure quelle il cui field type un tipo base (tagIsBaseType(t, ctx))
     let initTags = ctx.tags.filter(t => (t.var === v.id && device.id === t.device && t.type_field !== null && IsBaseType(t.type_field, ctx.fields, ctx.types).result) || (t.var === v.id && device.id === t.device && IsBaseType(v.id, ctx.vars, ctx.types).result))
-    console.log("initTags: ", initTags)
     initTags.forEach(t => {
       let type = t.type_field !== null ? IsBaseType(t.type_field, ctx.fields, ctx.types).type : IsBaseType(v.id, ctx.vars, ctx.types).type
       structs.tagType.push(ctx.types.find(t => t.id === type).name.toUpperCase())

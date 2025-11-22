@@ -27,50 +27,50 @@ function Pid(props) {
 
   const getSetValue = (ctrl) => {
     const setCtrl = Object.values(ctx.controls[device]).find(control => control.id === ctrl.fields.Set);
-    const tag = ctx.tags.find(t => t.id === setCtrl.fields.Value);
+    const tag = ctx.tags.find(t => t.fixed_id === setCtrl.fields.Value);
     return tag?.value?.value ?? '-';
   };
 
   const getRealValue = (ctrl) => {
-    const tag = ctx.tags.find(t => t.id === ctrl.id);
+    const tag = ctx.tags.find(t => t.fixed_id === ctrl.id);
     return tag?.value?.value ?? '-';
   };
 
   const getBoolValue = (ctrl) => {
-    const tag = ctx.tags.find(t => t.id === ctrl.id);
+    const tag = ctx.tags.find(t => t.fixed_id === ctrl.id);
     return tag?.value?.value ?? false;
   };
 
   //this controls has several subcontrols:
   //We need to retrieve the subcontrols to fully describe the component
-  const SetCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Set)
-  const ActCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Act)
-  const ErrorCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Error)
-  const kpErrorCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.kpError)
-  const AntiWindupContributeCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.AntiWindupContribute)
-  const CorrectionCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Correction)
-  const DerivativeCorrectionCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.DerivativeCorrection)
-  const ProportionalCorrectionCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.ProportionalCorrection)
-  const IntegralCorrectionCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.IntegralCorrection)
-  const PidMaxCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.PidMax)
-  const PidMinCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.PidMin)
-  const PidOutCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.PidOut)
-  const ReferenceCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Reference)
-  const RawOutCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.RawOut)
-  const OutMaxCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.OutMax)
-  const OutMinCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.OutMin)
-  const OutCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Out)
-  const ManualRefCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.ManualRef)
-  const ManualModeCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.ManualMode)
-  const StopCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Stop)
-  const OutSatCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.OutSat)
-  const kPCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.kP)
-  const TdCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Td)
-  const GpCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Gp)
-  const TiCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Ti)
-  const OutGradientCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.OutGradient)
-  const TawCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Taw)
-  const SetpointGradientCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.SetpointGradient)
+  const SetCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Set)
+  const ActCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Act)
+  const ErrorCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Error)
+  const kpErrorCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.kpError)
+  const AntiWindupContributeCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.AntiWindupContribute)
+  const CorrectionCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Correction)
+  const DerivativeCorrectionCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.DerivativeCorrection)
+  const ProportionalCorrectionCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.ProportionalCorrection)
+  const IntegralCorrectionCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.IntegralCorrection)
+  const PidMaxCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.PidMax)
+  const PidMinCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.PidMin)
+  const PidOutCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.PidOut)
+  const ReferenceCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Reference)
+  const RawOutCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.RawOut)
+  const OutMaxCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.OutMax)
+  const OutMinCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.OutMin)
+  const OutCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Out)
+  const ManualRefCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.ManualRef)
+  const ManualModeCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.ManualMode)
+  const StopCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Stop)
+  const OutSatCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.OutSat)
+  const kPCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.kP)
+  const TdCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Td)
+  const GpCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Gp)
+  const TiCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Ti)
+  const OutGradientCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.OutGradient)
+  const TawCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Taw)
+  const SetpointGradientCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.SetpointGradient)
 
   // Configurazione PID diagram (esempio base)
   const config = {
@@ -125,11 +125,11 @@ function Pid(props) {
     //const decimals = decimalsTag?.value?.value ?? 0; // Usa 0 come valore predefinito se Decimals è null
     const umTag = ctx.ums.find(um => um.id === props.ctrl.um)
     const um = umTag?.metric ?? "Unknown Unit" // Usa "Unknown Unit" come valore predefinito se non trovato
-    const setTag = ctx.tags.find(t => t.id === setCtrl.fields.Value)
+    const setTag = ctx.tags.find(t => t.fixed_id === setCtrl.fields.Value)
     const set = setTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Set è null
-    const maxTag = ctx.tags.find(t => t.id === limitCtrl.fields.Max)
+    const maxTag = ctx.tags.find(t => t.fixed_id === limitCtrl.fields.Max)
     const max = maxTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Max è null
-    const minTag = ctx.tags.find(t => t.id === limitCtrl.fields.Min)
+    const minTag = ctx.tags.find(t => t.fixed_id === limitCtrl.fields.Min)
     const min = minTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Min è null
     setInputValue(set) // Imposta il valore corrente come valore iniziale
     setPopupData({

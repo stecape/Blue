@@ -32,22 +32,22 @@ function SetAct(props) {
 
   //this controls has 3 subcontrols: set, act and limit.
   //We need to retrieve the subcontrols to fully describe the component
-  const setCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Set)
-  const actCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Act)
-  const limitCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Limit)
+  const setCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Set)
+  const actCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Act)
+  const limitCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Limit)
 
   //Retrieving all the divice information from the control and the subcontrols
-  const decimalsTag = ctx.tags.find(t => t.id === props.ctrl.fields.Decimals);
+  const decimalsTag = ctx.tags.find(t => t.fixed_id === props.ctrl.fields.Decimals);
   const decimals = decimalsTag?.value?.value ?? 0; // Usa 0 come valore predefinito se Decimals è null
   const umTag = ctx.ums.find(um => um.id === props.ctrl.um)
   const um = umTag?.metric ?? "Unknown Unit" // Usa "Unknown Unit" come valore predefinito se non trovato
-  const setTag = ctx.tags.find(t => t.id === setCtrl.fields.Value)
+  const setTag = ctx.tags.find(t => t.fixed_id === setCtrl.fields.Value)
   const set = setTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Set è null
-  const actTag = ctx.tags.find(t => t.id === actCtrl.fields.HMIValue)
+  const actTag = ctx.tags.find(t => t.fixed_id === actCtrl.fields.HMIValue)
   const act = parseFloat(actTag?.value?.value?.toFixed(decimals) ?? 0)
-  const maxTag = ctx.tags.find(t => t.id === limitCtrl.fields.Max)
+  const maxTag = ctx.tags.find(t => t.fixed_id === limitCtrl.fields.Max)
   const max = maxTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Max è null
-  const minTag = ctx.tags.find(t => t.id === limitCtrl.fields.Min)
+  const minTag = ctx.tags.find(t => t.fixed_id === limitCtrl.fields.Min)
   const min = minTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Min è null
 
   // Funzione per aprire il popup

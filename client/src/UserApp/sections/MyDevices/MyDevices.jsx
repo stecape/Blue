@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import './MyDevices.scss'
+import DeviceInfoPanel from './DeviceInfoPanel'
 
 const MyDevices = () => {
   const [devices, setDevices] = useState([])
@@ -46,27 +47,7 @@ const MyDevices = () => {
     <div className="my-devices">
       <div className="devices-grid">
         {devices.map((device) => (
-          <div key={device.id} className="device-card">
-            <div className="device-header">
-              <h3>{device.name}</h3>
-              <span className={`device-status ${device.status === 1 ? 'online' : 'offline'}`}>
-                {device.status === 1 ? 'Online' : 'Offline'}
-              </span>
-            </div>
-            <div className="device-body">
-              <div className="device-info">
-                <span className="label">Template:</span>
-                <span className="value">{device.template}</span>
-              </div>
-              <div className="device-info">
-                <span className="label">Device ID:</span>
-                <span className="value">#{device.id}</span>
-              </div>
-            </div>
-            <div className="device-footer">
-              <button className="btn-details">View Details</button>
-            </div>
-          </div>
+          <DeviceInfoPanel key={device.id} device={device} />
         ))}
       </div>
     </div>

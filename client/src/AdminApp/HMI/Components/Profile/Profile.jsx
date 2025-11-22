@@ -40,51 +40,51 @@ function Profile(props) {
   const device = ctx.devices.find(d => d.id === props.ctrl.device)?.name || "Unknown Device";
 
   // Recupera i controls di times e values
-  const timesCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Times)
-  const valuesCtrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Values)
+  const timesCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Times)
+  const valuesCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Values)
   
   // Times Set Ctrl
-  const time_0_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === timesCtrl.fields._0)
-  const time_0_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === time_0_Set_Parent_Ctrl.fields.Set)
-  const time_0_value = ctx.tags.find(t => t.id === time_0_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const time_1_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === timesCtrl.fields._1)
-  const time_1_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === time_1_Set_Parent_Ctrl.fields.Set)
-  const time_1_value = ctx.tags.find(t => t.id === time_1_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const time_2_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === timesCtrl.fields._2)
-  const time_2_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === time_2_Set_Parent_Ctrl.fields.Set)
-  const time_2_value = ctx.tags.find(t => t.id === time_2_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const time_3_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === timesCtrl.fields._3)
-  const time_3_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === time_3_Set_Parent_Ctrl.fields.Set)
-  const time_3_value = ctx.tags.find(t => t.id === time_3_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const time_4_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === timesCtrl.fields._4)
-  const time_4_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === time_4_Set_Parent_Ctrl.fields.Set)
-  const time_4_value = ctx.tags.find(t => t.id === time_4_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const time_5_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === timesCtrl.fields._5)
-  const time_5_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === time_5_Set_Parent_Ctrl.fields.Set)
-  const time_5_value = ctx.tags.find(t => t.id === time_5_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const time_0_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === timesCtrl.fields._0)
+  const time_0_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === time_0_Set_Parent_Ctrl.fields.Set)
+  const time_0_value = ctx.tags.find(t => t.fixed_id === time_0_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const time_1_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === timesCtrl.fields._1)
+  const time_1_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === time_1_Set_Parent_Ctrl.fields.Set)
+  const time_1_value = ctx.tags.find(t => t.fixed_id === time_1_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const time_2_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === timesCtrl.fields._2)
+  const time_2_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === time_2_Set_Parent_Ctrl.fields.Set)
+  const time_2_value = ctx.tags.find(t => t.fixed_id === time_2_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const time_3_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === timesCtrl.fields._3)
+  const time_3_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === time_3_Set_Parent_Ctrl.fields.Set)
+  const time_3_value = ctx.tags.find(t => t.fixed_id === time_3_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const time_4_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === timesCtrl.fields._4)
+  const time_4_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === time_4_Set_Parent_Ctrl.fields.Set)
+  const time_4_value = ctx.tags.find(t => t.fixed_id === time_4_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const time_5_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === timesCtrl.fields._5)
+  const time_5_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === time_5_Set_Parent_Ctrl.fields.Set)
+  const time_5_value = ctx.tags.find(t => t.fixed_id === time_5_Set_Ctrl.fields.Value)?.value?.value || 0;
   
   // Values Set Ctrl
-  const value_0_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === valuesCtrl.fields._0)
-  const value_0_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === value_0_Set_Parent_Ctrl.fields.Set)
-  const value_0_value = ctx.tags.find(t => t.id === value_0_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const value_1_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === valuesCtrl.fields._1)
-  const value_1_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === value_1_Set_Parent_Ctrl.fields.Set)
-  const value_1_value = ctx.tags.find(t => t.id === value_1_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const value_2_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === valuesCtrl.fields._2)
-  const value_2_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === value_2_Set_Parent_Ctrl.fields.Set)
-  const value_2_value = ctx.tags.find(t => t.id === value_2_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const value_3_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === valuesCtrl.fields._3)
-  const value_3_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === value_3_Set_Parent_Ctrl.fields.Set)
-  const value_3_value = ctx.tags.find(t => t.id === value_3_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const value_4_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === valuesCtrl.fields._4)
-  const value_4_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === value_4_Set_Parent_Ctrl.fields.Set)
-  const value_4_value = ctx.tags.find(t => t.id === value_4_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const value_5_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === valuesCtrl.fields._5)
-  const value_5_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === value_5_Set_Parent_Ctrl.fields.Set)
-  const value_5_value = ctx.tags.find(t => t.id === value_5_Set_Ctrl.fields.Value)?.value?.value || 0;
-  const output_Actual_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === props.ctrl.fields.Output)
-  const output_Actual_Ctrl = Object.values(ctx.controls[device]).find(control => control.id === output_Actual_Parent_Ctrl.fields.Act)
-  const output_value_raw = ctx.tags.find(t => t.id === output_Actual_Ctrl.fields.HMIValue)?.value?.value || 0;
+  const value_0_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === valuesCtrl.fields._0)
+  const value_0_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === value_0_Set_Parent_Ctrl.fields.Set)
+  const value_0_value = ctx.tags.find(t => t.fixed_id === value_0_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const value_1_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === valuesCtrl.fields._1)
+  const value_1_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === value_1_Set_Parent_Ctrl.fields.Set)
+  const value_1_value = ctx.tags.find(t => t.fixed_id === value_1_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const value_2_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === valuesCtrl.fields._2)
+  const value_2_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === value_2_Set_Parent_Ctrl.fields.Set)
+  const value_2_value = ctx.tags.find(t => t.fixed_id === value_2_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const value_3_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === valuesCtrl.fields._3)
+  const value_3_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === value_3_Set_Parent_Ctrl.fields.Set)
+  const value_3_value = ctx.tags.find(t => t.fixed_id === value_3_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const value_4_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === valuesCtrl.fields._4)
+  const value_4_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === value_4_Set_Parent_Ctrl.fields.Set)
+  const value_4_value = ctx.tags.find(t => t.fixed_id === value_4_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const value_5_Set_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === valuesCtrl.fields._5)
+  const value_5_Set_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === value_5_Set_Parent_Ctrl.fields.Set)
+  const value_5_value = ctx.tags.find(t => t.fixed_id === value_5_Set_Ctrl.fields.Value)?.value?.value || 0;
+  const output_Actual_Parent_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === props.ctrl.fields.Output)
+  const output_Actual_Ctrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === output_Actual_Parent_Ctrl.fields.Act)
+  const output_value_raw = ctx.tags.find(t => t.fixed_id === output_Actual_Ctrl.fields.HMIValue)?.value?.value || 0;
   const output_value = typeof output_value_raw === 'number' ? output_value_raw.toFixed(2) : output_value_raw;
 
   // Chart data (x: time, y: value)
@@ -126,19 +126,19 @@ function Profile(props) {
   const openDialog = (ctrl) => {
     //this control has 2 subcontrols: set and limit.
     //We need to retrieve the subcontrols to fully describe the component
-    const setCtrl = Object.values(ctx.controls[device]).find(control => control.id === ctrl.fields.Set)
-    const limitCtrl = Object.values(ctx.controls[device]).find(control => control.id === ctrl.fields.Limit)
+    const setCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === ctrl.fields.Set)
+    const limitCtrl = Object.values(ctx.controls[device]).find(control => control.fixed_id === ctrl.fields.Limit)
 
     //Retrieving all the divice information from the control and the subcontrols
     //const decimalsTag = ctx.tags.find(t => t.id === props.ctrl.fields.Decimals);
     //const decimals = decimalsTag?.value?.value ?? 0; // Usa 0 come valore predefinito se Decimals è null
     const umTag = ctx.ums.find(um => um.id === props.ctrl.um)
     const um = umTag?.metric ?? "Unknown Unit" // Usa "Unknown Unit" come valore predefinito se non trovato
-    const setTag = ctx.tags.find(t => t.id === setCtrl.fields.Value)
+    const setTag = ctx.tags.find(t => t.fixed_id === setCtrl.fields.Value)
     const set = setTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Set è null
-    const maxTag = ctx.tags.find(t => t.id === limitCtrl.fields.Max)
+    const maxTag = ctx.tags.find(t => t.fixed_id === limitCtrl.fields.Max)
     const max = maxTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Max è null
-    const minTag = ctx.tags.find(t => t.id === limitCtrl.fields.Min)
+    const minTag = ctx.tags.find(t => t.fixed_id === limitCtrl.fields.Min)
     const min = minTag?.value?.value ?? 0 // Usa 0 come valore predefinito se Min è null
     setInputValue(set) // Imposta il valore corrente come valore iniziale
     setPopupData({

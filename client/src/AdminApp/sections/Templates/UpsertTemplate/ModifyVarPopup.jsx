@@ -28,8 +28,6 @@ function ModifyVarPopup (props) {
   // Input Validation
   const InlineValidation = (value) => {
     let pattern = /[^A-Za-z0-9_]|^[^A-Za-z_]/
-    console.log("props: ", props)
-    console.log("value: ", value)
       setModalState((prevState) => ({ ...prevState, name: value, varNameNotValid: pattern.test(value) || props.vars.find(i => i.name === value && i.QRef !== props.QRef) || value === "" }));
   }
 
@@ -78,7 +76,6 @@ function ModifyVarPopup (props) {
   };
 
   useEffect(() => {
-    console.log("props", props)
     setModalState((prevState) => ({
       ...prevState,
       name: props.name,

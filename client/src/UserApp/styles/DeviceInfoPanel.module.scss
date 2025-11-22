@@ -1,0 +1,29 @@
+.deviceInfoPanel {
+  background: #232323;
+  color: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  max-width: 600px;
+}
+.deviceName {
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+.infoGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.sensors {
+  margin-top: 1rem;
+}
+.online {
+  color: #4caf50;
+  font-weight: bold;
+}
+.offline {
+  color: #f44336;
+  font-weight: bold;
+}
