@@ -2,11 +2,11 @@
   "name": "server",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "start": "node ./src/index.js",
-    "watch": "nodemon ./src/index.js",
-    "generate-secret": "node generate-secret.js"
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "dependencies": {
     "connect-pg-simple": "^10.0.0",
@@ -23,8 +23,12 @@
     "socket.io": "^4.5.3"
   },
   "devDependencies": {
+    "@types/connect-pg-simple": "^7.0.3",
+    "@types/express-session": "^1.18.2",
+    "@types/node": "^24.10.1",
     "connect-livereload": "^0.6.1",
     "livereload": "^0.9.3",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "typescript": "^5.9.3"
   }
 }

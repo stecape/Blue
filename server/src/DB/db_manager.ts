@@ -1,4 +1,4 @@
-import pg from 'pg'
+import { Pool, PoolClient } from 'pg'
 import { db_dialect, db_user, db_password, db_host, db_port, db_name } from './db_config.js'
 import db_filler from './db_filler.js'
 import db_listener from './db_listener.js'
@@ -6,12 +6,15 @@ import globalEventEmitter from '../Helpers/globalEventEmitter.js' // Import glob
 
 const connStr = `${db_dialect}://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}`
 
-export var pool
-export var dbConnected = false
+export var pool: Pool
+export var dbConnected: boolean
 
-let initializePromise = null; // Promise condivisa per sincronizzare le chiamate a initialize
+let initializePromise: Promise<PoolClient> | null = null; // Promise condivisa per sincronizzare le chiamate a initialize
 
-function initialize(pool) {
+// Track pools with registered error handlers
+const poolsWithErrorHandler = new WeakSet<Pool>();
+
+function initialize(pool: Pool) {
   if (initializePromise) {
     return initializePromise; // Restituisci la Promise condivisa se già in esecuzione
   }
@@ -32,23 +35,29 @@ function initialize(pool) {
       console.log("Initialize: Pool connected")
 
       // Handle unexpected errors on client
-      client.on('error', (err) => {
-        console.error('Unexpected error on idle client', err)
-        client.release(true) // Rilascia il client e rimuovilo dal pool
-        dbConnected = false;
-        globalEventEmitter.emit('dbDisconnected'); // Emit the dbDisconnected event
-        initializePromise = null; // Resetta la Promise condivisa
-        setTimeout(() => initialize(pool).then(resolve).catch(reject), 5000); // Retry after 5 seconds
-      })
+      if (client) {
+        client.on('error', (err) => {
+          console.error('Unexpected error on idle client', err)
+          client.release(true) // Rilascia il client e rimuovilo dal pool
+          dbConnected = false;
+          globalEventEmitter.emit('dbDisconnected'); // Emit the dbDisconnected event
+          initializePromise = null; // Resetta la Promise condivisa
+          setTimeout(() => initialize(pool).then(resolve).catch(reject), 5000); // Retry after 5 seconds
+        })
+      }
 
       db_filler(client)
         .then(() => {
           initializePromise = null; // Resetta la Promise condivisa
-          resolve(client);
+          if (client) {
+            resolve(client);
+          } else {
+            reject(new Error("Pool connected but client is undefined"));
+          }
         })
         .catch((err) => {
           console.error("Initialize: Error filling the database", err);
-          client.release(true); // Rilascia il client e rimuovilo dal pool
+          if (client) client.release(true); // Rilascia il client e rimuovilo dal pool
           dbConnected = false;
           globalEventEmitter.emit('dbDisconnected'); // Emit the dbDisconnected event
           initializePromise = null; // Resetta la Promise condivisa
@@ -57,7 +66,7 @@ function initialize(pool) {
     });
 
     // Gestisci errori imprevisti sul pool (registra solo una volta)
-    if (!pool._errorHandlerRegistered) {
+    if (!poolsWithErrorHandler.has(pool)) {
       console.log("Initialize: Registering error handler on pool")
       pool.on('error', (err) => {
         console.error('Unexpected error on pool', err);
@@ -66,7 +75,7 @@ function initialize(pool) {
         initializePromise = null; // Resetta la Promise condivisa
         setTimeout(() => initialize(pool).then(resolve).catch(reject), 5000); // Retry after 5 seconds
       });
-      pool._errorHandlerRegistered = true; // Segna il gestore come registrato
+      poolsWithErrorHandler.add(pool); // Segna il gestore come registrato
     }
   });
 
@@ -75,7 +84,6 @@ function initialize(pool) {
 
 export function db_manager() {
   return new Promise((resolve, reject) => {
-    const {Pool} = pg
     pool = new Pool({
       connectionString: connStr,
       idleTimeoutMillis: 30000, // Close idle clients after 30 seconds

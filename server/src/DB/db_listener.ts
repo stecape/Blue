@@ -1,7 +1,9 @@
-import globalEventEmitter from '../Helpers/globalEventEmitter.js'; // Import globalEventEmitter
+
+import { PoolClient, Notification } from 'pg';
+import globalEventEmitter from '../Helpers/globalEventEmitter'; // Import globalEventEmitter
 
 
-export default function (client) {
+export default function (client: PoolClient) {
   return new Promise((innerResolve, innerReject) => {
 
     // Designate which channels we are listening on. Add additional channels with multiple lines.
@@ -17,10 +19,12 @@ export default function (client) {
       })
 
       // Listen for all pg_notify channel messages and loggin them
-      client.on('notification', function (msg) {
-        let payload = JSON.parse(msg.payload);
-        //console.log(payload);
-        globalEventEmitter.emit('update', payload);
+      client.on('notification', function (msg: Notification) {
+        if (msg.payload ){
+          let payload = JSON.parse(msg.payload);
+          //console.log(payload);
+          globalEventEmitter.emit('update', payload);
+        }
       })
   })
 }
