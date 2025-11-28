@@ -1,7 +1,10 @@
 import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
+import { Application, Request, Response } from 'express';
+import { Pool } from 'pg';
 import { isAdmin } from '../auth_api.js';
+import { ErrorResponse, AddFieldRequest, AddFieldResponse, ModifyFieldRequest, ModifyFieldResponse, GetFieldsRequest, GetFieldsResponse, DBField, TempField, TypeDeps, TypeParentPairObj } from 'shared/types';
 
-export default function (app, pool) {
+export default function (app: Application, pool: Pool) {
   /*
   Add a Field
   Type:   POST
@@ -10,11 +13,13 @@ export default function (app, pool) {
             name, type, parent_type, fixed_id, um, logic_state, comment
           }
   */
-  app.post('/api/addField', isAdmin, (req, res) => {
+  app.post('/api/addField', isAdmin, (req: Request<AddFieldRequest>, res: Response<AddFieldResponse | ErrorResponse>) => {
     const { name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
     const queryString = `INSERT INTO "Field" (name, type, parent_type, fixed_id, um, logic_state, comment) VALUES ('${name}', ${type}, ${parent_type}, ${fixed_id}, ${um}, ${logic_state}, '${comment}') RETURNING id`;
-    pool.query({ text: queryString, rowMode: 'array' })
-      .then(data => res.json({ result: data.rows, message: "Field added" }))
+    pool.query({ text: queryString })
+      .then(data => {
+        const id: number = data.rows[0].id
+        res.json({ result: id, message: "Field added" })})
       .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
 
@@ -26,7 +31,7 @@ export default function (app, pool) {
             id, name, type, parent_type, fixed_id, um, logic_state, comment
           }
   */
-  app.post('/api/modifyField', isAdmin, (req, res) => {
+  app.post('/api/modifyField', isAdmin, (req: Request<ModifyFieldRequest>, res: Response<ModifyFieldResponse | ErrorResponse>) => {
     const { id, name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
     const queryString = `UPDATE "Field" SET name = '${name}', type = ${type}, parent_type = ${parent_type}, fixed_id = ${fixed_id}, um = ${um}, logic_state = ${logic_state}, comment = '${comment}' WHERE id = ${id}`;
     pool.query({ text: queryString, rowMode: 'array' })
@@ -62,17 +67,12 @@ export default function (app, pool) {
     }
   }
 
-  const getDeps = (type) => {
+  const getDeps = (type: number) => {
     //This method, given a type ID, returns the dependencies tree of a type.
     return new Promise((resolve, reject) => {
       // response struct preset
-      var response = {
-        name: "",
-        type: type,
-        fields: [],
-        deps: []
-      };
-      var result = [];
+      var response: TypeDeps;
+      var result: TypeParentPairObj[];
       // Type name query
       var queryString = `SELECT name FROM "Type" WHERE id = ${type}`;
       pool.query({
@@ -85,33 +85,35 @@ export default function (app, pool) {
           // Query for the fields that depend on that type
           queryString = `SELECT * FROM "Field" WHERE parent_type = ${type}`;
           return pool.query({
-            text: queryString,
-            rowMode: 'array',
+            text: queryString
           });
         })
         .then((data) => {
           // Filling up the "fields" part of the response struct
-          response.fields = data.rows.map((field, i) => ({
-            id: field[0],
-            name: field[1],
-            type: field[2],
-            parent_type: field[3],
-            fixed_id: field[4],
-            um: field[5],
-            logic_state: field[6],
-            comment: field[7],
-            QRef: i,
-          }));
+          response.fields = data.rows.map((field: DBField, i: number) => {
+            const f: TempField = {
+              id: field.id,
+              name: field.name,
+              type: field.type,
+              parent_type: field.parent_type,
+              fixed_id: field.fixed_id,
+              um: field.um,
+              logic_state: field.logic_state,
+              comment: field.comment,
+              QRef: i,
+            }
+            return f
+          });
           /*
           Questa query per ogni type, dato il type.id, per tutti e soli i fields di quel type, restituisce l'arrey delle coppie [type.id, field.parent_type], prese una volta sola (le coppie non si ripetono: se un type id è presente due volte in un parent type, viene considerato una volta sola. ES: type ambientContitions : {(act) temperature, (act) moisture})
           [
-            [ 1, 5 ],     [ 1, 6 ],
-            [ 1, 7 ],     [ 3, 101 ],
-            [ 5, 8 ],     [ 5, 10 ],
-            [ 6, 9 ],     [ 6, 10 ],
-            [ 7, 8 ],     [ 7, 9 ],
-            [ 7, 10 ],    [ 10, 100 ],
-            [ 101, 100 ]
+            { type: 1, parent_type: 5 },     { type: 1, parent_type: 6 },
+            { type: 1, parent_type: 7 },     { type: 3, parent_type: 101 },
+            { type: 5, parent_type: 8 },     { type: 5, parent_type: 10 },
+            { type: 6, parent_type: 9 },     { type: 6, parent_type: 10 },
+            { type: 7, parent_type: 8 },     { type: 7, parent_type: 9 },
+            { type: 7, parent_type: 10 },    { type: 10, parent_type: 100 },
+            { type: 101, parent_type: 100 }
           ]
           */
           queryString = `
@@ -122,14 +124,15 @@ export default function (app, pool) {
           ORDER by id
           `;
           return pool.query({
-            text: queryString,
-            rowMode: 'array',
+            text: queryString
           });
         })
         .then((data) => {
-          result = data.rows;
+          result = data.rows as TypeParentPairObj[];
           /*
-          La seguente query, dato l'insieme di tutti i parent_types nella tabella fields, e l'insieme di tutti i types che sono stati usati a loro volta come field in un type (types.id = fields.type), restituisce i valori esterni, ovvero tutti i parent_type dalla tabella "Field" che non vengono usati come field type nella tabella field.
+          La seguente query, dato l'insieme di tutti i parent_types nella tabella fields,
+          e l'insieme di tutti i types che sono stati usati a loro volta come field in un type (types.id = fields.type),
+          restituisce i valori esterni, ovvero tutti i parent_type dalla tabella "Field" che non vengono usati come field type nella tabella field.
           Restituisce in pratica tutti i tipi che non hanno un parent type, che quindi nessuno dipende da loro.
           Risultato per type = 100
           [ [ 8 ], [ 9 ], [ 100 ] ]
@@ -148,12 +151,11 @@ export default function (app, pool) {
           `;
           return pool.query({
             text: queryString,
-            rowMode: 'array',
           });
         })
         .then((data) => {
           // Creating the Graph of the dependencies of the types
-          var graph = {};
+          var graph: { [key: number]: number[] } = {};
           /*
           For each row of the previous query, popolo la struttura graph. Result contiene i risultati della prima query. graph conterrà per ogni type tutti i parent type che dipendono da lui:
             graph = {
@@ -169,7 +171,7 @@ export default function (app, pool) {
               595: []
             };
           */
-          result.forEach((k) => (graph[k[0]] = result.filter((i) => i[0] == k[0]).map((j) => j[1])));
+          result.forEach((k) => (graph[k.type] = result.filter((i) => i.type == k.type).map((j) => j.parent_type)));
           data.rows.map((k) => (graph[k[0]] = []));
           // response.deps conterrà un array con gli ID di tutti i type che dipendono da uno specifico type. Ad esempio il graph nel commento di prima, DFS con type = 395, restituirà [395 396 592 594 595 593]
           response.deps = [...DFS(graph, type)]; // Spread operator, DSF returns a Set, I want an array
@@ -209,7 +211,7 @@ export default function (app, pool) {
           }
   Err:    400
   */
-  app.post('/api/getFields', isAdmin, (req, res) => {
+  app.post('/api/getFields', isAdmin, (req: Request<GetFieldsRequest>, res: Response<GetFieldsResponse | ErrorResponse>) => {
     getDeps(req.body.type)
     .then(response => {
       res.json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
