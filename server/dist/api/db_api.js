@@ -42,7 +42,7 @@ function default_1(app, pool) {
     Err:    400
     */
     app.post('/api/exec', auth_api_js_1.isAdmin, (req, res) => {
-        var queryString = req.body.query;
+        const queryString = req.body.query;
         console.log(queryString);
         pool.query({
             text: queryString,
@@ -72,7 +72,7 @@ function default_1(app, pool) {
     Err:    400
     */
     app.post('/api/getAll', auth_api_js_1.isAuthenticated, (req, res) => {
-        var queryString = `SELECT ${req.body.fields.join(',')} FROM "${req.body.table}" ORDER BY id ASC`;
+        const queryString = `SELECT ${req.body.fields.join(',')} FROM "${req.body.table}" ORDER BY id ASC`;
         //console.log(queryString)
         pool.query({
             text: queryString,

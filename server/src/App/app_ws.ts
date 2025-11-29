@@ -4,7 +4,7 @@ import express, { json } from 'express'
 import { createServer } from 'http'
 import { Server } from "socket.io"
 
-let server
+let server: ReturnType<typeof createServer>
 
 const app_ws = () => {
 

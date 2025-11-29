@@ -86,7 +86,7 @@ function default_1(app, pool) {
     });
     // Elimina un dispositivo (solo admin)
     app.post('/api/removeDevice', auth_api_js_1.isAdmin, (req, res) => {
-        var queryString = `DELETE FROM "Device" WHERE id = ${req.body.id};`;
+        const queryString = `DELETE FROM "Device" WHERE id = ${req.body.id};`;
         pool.query({
             text: queryString,
             rowMode: 'array'

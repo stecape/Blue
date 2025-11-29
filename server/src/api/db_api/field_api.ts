@@ -13,36 +13,51 @@ type TypesWithoutParent = { parent_type: number };
 
 // API implementation
 export default function (app: Application, pool: Pool) {
-  /*
-  Add a Field
-  Type:   POST
-  Route:  '/api/addField'
-  Body:   {
-            name, type, parent_type, fixed_id, um, logic_state, comment
-          }
-  */
+  /**
+   * Aggiungi un campo (Field)
+   * @route POST /api/addField
+   * @access Admin
+   * @param {Object} req - La richiesta HTTP
+   * @param {Object} req.body - Il corpo della richiesta
+   * @param {string} req.body.name - Il nome del campo
+   * @param {number} req.body.type - L'ID del tipo del campo
+   * @param {number} req.body.parent_type - L'ID del parent type
+   * @param {number} req.body.fixed_id - L'ID fisso (opzionale)
+   * @param {number} req.body.um - L'unità di misura (opzionale)
+   * @param {number} req.body.logic_state - Lo stato logico (opzionale)
+   * @param {string} req.body.comment - Un commento (opzionale)
+   * @param {Object} res - La risposta HTTP
+   * @returns {Object} L'ID del campo aggiunto e un messaggio di conferma
+   */
   app.post('/api/addField', isAdmin, (req: Request<AddFieldRequest>, res: Response<AddFieldResponse | ErrorResponse>) => {
     const { name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
     const queryString = `INSERT INTO "Field" (name, type, parent_type, fixed_id, um, logic_state, comment) VALUES ('${name}', ${type}, ${parent_type}, ${fixed_id}, ${um}, ${logic_state}, '${comment}') RETURNING id`;
-    pool.query({ text: queryString })
-      .then(data => {
-        const id: number = data.rows[0].id
-        res.json({ result: id, message: "Field added" })})
+    pool.query(queryString)
+      .then(data => res.json({ result: data.rows[0].id, message: "Field added" }))
       .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
 
-  /*
-  Modify a Field
-  Type:   POST
-  Route:  '/api/modifyField'
-  Body:   {
-            id, name, type, parent_type, fixed_id, um, logic_state, comment
-          }
-  */
+  /**
+   * Modifica un campo (Field)
+   * @route POST /api/modifyField
+   * @access Admin
+   * @param {Object} req - La richiesta HTTP
+   * @param {Object} req.body - Il corpo della richiesta
+   * @param {number} req.body.id - L'ID del campo da modificare
+   * @param {string} req.body.name - Il nuovo nome del campo
+   * @param {number} req.body.type - Il nuovo tipo del campo
+   * @param {number} req.body.parent_type - Il nuovo parent type
+   * @param {number} req.body.fixed_id - Il nuovo fixed_id
+   * @param {number} req.body.um - La nuova unità di misura
+   * @param {number} req.body.logic_state - Il nuovo stato logico
+   * @param {string} req.body.comment - Il nuovo commento
+   * @param {Object} res - La risposta HTTP
+   * @returns {Object} Messaggio di conferma
+   */
   app.post('/api/modifyField', isAdmin, (req: Request<ModifyFieldRequest>, res: Response<ModifyFieldResponse | ErrorResponse>) => {
     const { id, name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
     const queryString = `UPDATE "Field" SET name = '${name}', type = ${type}, parent_type = ${parent_type}, fixed_id = ${fixed_id}, um = ${um}, logic_state = ${logic_state}, comment = '${comment}' WHERE id = ${id}`;
-    pool.query({ text: queryString, rowMode: 'array' })
+    pool.query(queryString)
       .then(data => res.json({ result: data.rows, message: "Field updated" }))
       .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
@@ -86,7 +101,7 @@ export default function (app: Application, pool: Pool) {
       var response: TypeDeps;
       var result: TypeParentPairObj[];
       // Type name query
-      var queryString = `SELECT name FROM "Type" WHERE id = ${type}`;
+      const queryString = `SELECT name FROM "Type" WHERE id = ${type}`;
       pool.query({
         text: queryString,
         rowMode: 'array',
@@ -95,10 +110,8 @@ export default function (app: Application, pool: Pool) {
           // Filling the response struct with the main type name
           response.name = name.rows[0][0];
           // Query for the fields that depend on that type
-          queryString = `SELECT * FROM "Field" WHERE parent_type = ${type}`;
-          return pool.query({
-            text: queryString
-          });
+          const queryString = `SELECT * FROM "Field" WHERE parent_type = ${type}`;
+          return pool.query(queryString);
         })
         .then((data) => {
           // Filling up the "fields" part of the response struct
@@ -128,7 +141,7 @@ export default function (app: Application, pool: Pool) {
             { type: 101, parent_type: 100 }
           ]
           */
-          queryString = `
+          const queryString = `
           SELECT
           distinct "Type".id, "Field".parent_type
           FROM "Type"
@@ -149,7 +162,7 @@ export default function (app: Application, pool: Pool) {
           Risultato per type = 100
           [ [ 8 ], [ 9 ], [ 100 ] ]
           */
-          queryString = `
+          const queryString = `
             SELECT
             distinct "Field".parent_type
             FROM "Field"
@@ -161,9 +174,7 @@ export default function (app: Application, pool: Pool) {
             ) a ON a.id = "Field".parent_type
             WHERE a.id IS NULL
           `;
-          return pool.query({
-            text: queryString,
-          });
+          return pool.query(queryString);
         })
         .then((data) => {
           const highestTypes: TypesWithoutParent[] = data.rows as TypesWithoutParent[];
@@ -193,36 +204,28 @@ export default function (app: Application, pool: Pool) {
     });
   };
   
-  /*
-  Read fields
-  Type:   POST
-  Route:  '/api/getFields'
-  Body:   { type: 128 }
-  Query:  SELECT * from "Field" where "parent_type" = 128
-  Event:  -
-  Res:    200,
-          {
-            "result": {
-              "name": "_Act",
-              "type": 6,
-              "fields": [
-                  {
-                      "id": 3,
-                      "name": "Value",
-                      "type": 1,
-                      "QRef": 0
-                  }
-              ],
-              "deps": [
-                  6,
-                  9,
-                  10
-              ]
-            },
-            "message": "Record(s) from table \"Field\" returned correctly"
-          }
-  Err:    400
-  */
+  /**
+   * Ottieni i campi (Fields) e le dipendenze di un parent type
+   * @route POST /api/getFields
+   * @access Admin
+   * @param {Object} req - La richiesta HTTP
+   * @param {Object} req.body - Il corpo della richiesta
+   * @param {number} req.body.type - L'ID del parent type di cui ottenere i campi
+   * @param {Object} res - La risposta HTTP
+   * @returns {Object} Un oggetto con nome del type, array di fields e array di dipendenze, più un messaggio di conferma
+   * @example
+   * {
+   *   "result": {
+   *     "name": "_Act",
+   *     "type": 6,
+   *     "fields": [
+   *       { "id": 3, "name": "Value", "type": 1, "QRef": 0 }
+   *     ],
+   *     "deps": [6, 9, 10]
+   *   },
+   *   "message": "Record(s) from table 'Field' returned correctly"
+   * }
+   */
   app.post('/api/getFields', isAdmin, (req: Request<GetFieldsRequest>, res: Response<GetFieldsResponse | ErrorResponse>) => {
     getDeps(req.body.type)
     .then(response => {

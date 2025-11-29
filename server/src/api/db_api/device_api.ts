@@ -21,41 +21,6 @@ export default function (app: Application, pool: Pool) {
    * @returns {Object} L'ID del dispositivo aggiunto e un messaggio di conferma
    */
 
-
-  /**
-   * Modifica un dispositivo
-   * @route POST /api/modifyDevice
-   * @access Admin
-   * @param {Object} req - La richiesta HTTP
-   * @param {Object} req.body - Il corpo della richiesta
-   * @param {number} req.body.id - L'ID del dispositivo da modificare
-   * @param {string} req.body.name - Il nuovo nome del dispositivo
-   * @param {number} req.body.template - Il nuovo template del dispositivo
-   * @param {number} req.body.user_id - Il nuovo user_id del dispositivo
-   * @param {Object} res - La risposta HTTP
-   * @returns {Object} Messaggio di conferma
-   */
-
-
-  /**
-   * Ottieni tutti i dispositivi
-   * @route POST /api/getDevices
-   * @access Admin e User
-   * @param {Object} req - La richiesta HTTP
-   * @param {Object} res - La risposta HTTP
-   * @returns {Object} Un array di dispositivi e un messaggio di conferma
-   */
-  /**
-   * Elimina un dispositivo
-   * @route POST /api/removeDevice
-   * @access Admin
-   * @param {Object} req - La richiesta HTTP
-   * @param {Object} req.body - Il corpo della richiesta
-   * @param {number} req.body.id - L'ID del dispositivo da eliminare
-   * @param {Object} res - La risposta HTTP
-   * @returns {Object} Messaggio di conferma
-   */
-
   // Aggiungi un dispositivo (solo admin)
   app.post('/api/addDevice', isAdmin, (req: Request<AddDeviceRequest>, res: Response<AddDeviceResponse | ErrorResponse>) => {
     const userIdValue = (req.body.user_id !== undefined && req.body.user_id !== null && req.body.user_id !== 0) ? req.body.user_id : 'NULL';
@@ -72,6 +37,21 @@ export default function (app: Application, pool: Pool) {
     .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
 
+
+  /**
+   * Modifica un dispositivo
+   * @route POST /api/modifyDevice
+   * @access Admin
+   * @param {Object} req - La richiesta HTTP
+   * @param {Object} req.body - Il corpo della richiesta
+   * @param {number} req.body.id - L'ID del dispositivo da modificare
+   * @param {string} req.body.name - Il nuovo nome del dispositivo
+   * @param {number} req.body.template - Il nuovo template del dispositivo
+   * @param {number} req.body.user_id - Il nuovo user_id del dispositivo
+   * @param {Object} res - La risposta HTTP
+   * @returns {Object} Messaggio di conferma
+   */
+
   // Modifica un dispositivo (solo admin)
   app.post('/api/modifyDevice', isAdmin, (req: Request<ModifyDeviceRequest>, res: Response<ModifyDeviceResponse | ErrorResponse>) => {
     const { id, name, template, user_id } = req.body;
@@ -87,6 +67,16 @@ export default function (app: Application, pool: Pool) {
     })
     .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
+
+
+  /**
+   * Ottieni tutti i dispositivi
+   * @route POST /api/getDevices
+   * @access Admin e User
+   * @param {Object} req - La richiesta HTTP
+   * @param {Object} res - La risposta HTTP
+   * @returns {Object} Un array di dispositivi e un messaggio di conferma
+   */
 
   // Ottieni tutti i dispositivi (autenticato, filtrato per ruolo)
   app.get('/api/getDevices', isAuthenticated, (req: Request<GetDevicesRequest>, res: Response<GetDevicesResponse | ErrorResponse> ) => {
@@ -108,9 +98,21 @@ export default function (app: Application, pool: Pool) {
     .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
   });
   
+  
+  /**
+   * Elimina un dispositivo
+   * @route POST /api/removeDevice
+   * @access Admin
+   * @param {Object} req - La richiesta HTTP
+   * @param {Object} req.body - Il corpo della richiesta
+   * @param {number} req.body.id - L'ID del dispositivo da eliminare
+   * @param {Object} res - La risposta HTTP
+   * @returns {Object} Messaggio di conferma
+   */
+
   // Elimina un dispositivo (solo admin)
   app.post('/api/removeDevice', isAdmin, (req: Request<RemoveDeviceRequest>, res: Response<RemoveDeviceResponse | ErrorResponse>) => {
-    var queryString=`DELETE FROM "Device" WHERE id = ${req.body.id};`
+    const queryString=`DELETE FROM "Device" WHERE id = ${req.body.id};`
     pool.query({
       text: queryString,
       rowMode: 'array'

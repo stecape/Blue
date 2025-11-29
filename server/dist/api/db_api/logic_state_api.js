@@ -27,7 +27,7 @@ function default_1(app, pool) {
             }
     */
     app.post('/api/addLogicState', auth_api_js_1.isAdmin, (req, res) => {
-        var queryString = `INSERT INTO "LogicState" (id, name, value) VALUES (DEFAULT,'${req.body.name}',ARRAY[${req.body.value.map(item => `'${item}'`)}])`;
+        const queryString = `INSERT INTO "LogicState" (id, name, value) VALUES (DEFAULT,'${req.body.name}',ARRAY[${req.body.value.map(item => `'${item}'`)}])`;
         pool.query({
             text: queryString,
             rowMode: 'array'
@@ -58,7 +58,7 @@ function default_1(app, pool) {
     Err:    400
     */
     app.post('/api/modifyLogicState', auth_api_js_1.isAdmin, (req, res) => {
-        var queryString = `UPDATE "LogicState" SET name='${req.body.name}', value=ARRAY[${req.body.value.map(item => `'${item}'`)}] WHERE id = ${req.body.id}`;
+        const queryString = `UPDATE "LogicState" SET name='${req.body.name}', value=ARRAY[${req.body.value.map(item => `'${item}'`)}] WHERE id = ${req.body.id}`;
         //console.log(queryString)
         pool.query({
             text: queryString,
@@ -86,7 +86,7 @@ function default_1(app, pool) {
     Err:    400
     */
     app.post('/api/removeLogicState', auth_api_js_1.isAdmin, (req, res) => {
-        var queryString = `DELETE FROM "LogicState" WHERE id = ${req.body.id};`;
+        const queryString = `DELETE FROM "LogicState" WHERE id = ${req.body.id};`;
         pool.query({
             text: queryString,
             rowMode: 'array'

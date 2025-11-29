@@ -76,7 +76,7 @@ function default_1(app, pool) {
             };
             var result = [];
             // Type name query
-            var queryString = `SELECT name FROM "Type" WHERE id = ${type}`;
+            const queryString = `SELECT name FROM "Type" WHERE id = ${type}`;
             pool.query({
                 text: queryString,
                 rowMode: 'array',

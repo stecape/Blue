@@ -36,7 +36,7 @@ function default_1(app, pool) {
         var varComment = req.body.comment;
         var varFixedId = req.body.fixed_id;
         // Retreiving the typesList
-        var queryString = `SELECT * from "Type"`;
+        const queryString = `SELECT * from "Type"`;
         pool.query({
             text: queryString,
             rowMode: 'array',
@@ -95,7 +95,7 @@ function default_1(app, pool) {
         var varComment = req.body.comment;
         var varFixedId = req.body.fixed_id;
         // Retreiving the typesList
-        var queryString = `SELECT * from "Type"`;
+        const queryString = `SELECT * from "Type"`;
         pool.query({
             text: queryString,
             rowMode: 'array',
@@ -144,7 +144,7 @@ function default_1(app, pool) {
     Err:    400
     */
     app.post('/api/removeVar', auth_api_js_1.isAdmin, (req, res) => {
-        var queryString = `DELETE FROM "Var" WHERE id = ${req.body.id};`;
+        const queryString = `DELETE FROM "Var" WHERE id = ${req.body.id};`;
         pool.query({
             text: queryString,
             rowMode: 'array'

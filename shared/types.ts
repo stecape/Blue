@@ -27,6 +27,13 @@ export interface BackendStatusResponse {
 
 //DEVICES
 
+export interface DBDevice {
+  id: number;
+  name: string;
+  user_id: number;
+  template: number;
+}
+
 export interface AddDeviceRequest {
   name: string;
   user_id?: number;
@@ -38,11 +45,8 @@ export interface AddDeviceResponse {
   message: string;
 }
 
-export interface ModifyDeviceRequest {
-  id: number;
-  name: string;
-  template: string;
-  user_id: number;
+export interface ModifyDeviceRequest extends DBDevice {
+  // Inherits all fields from DBDevice
 }
 
 export interface ModifyDeviceResponse {
@@ -70,6 +74,17 @@ export interface RemoveDeviceResponse {
 
 //FIELDS
 
+export interface DBField {
+  id: number;
+  name: string;
+  type: number;
+  parent_type: number;
+  fixed_id: number;
+  um: number;
+  logic_state: number;
+  comment: string
+}
+
 export interface AddFieldRequest {
   name: string;
   type: number;
@@ -85,15 +100,8 @@ export interface AddFieldResponse {
   message: string;
 }
 
-export interface ModifyFieldRequest {
-  id: number;
-  name: string;
-  type: number;
-  parent_type: number;
-  fixed_id: number;
-  um: number;
-  logic_state: number;
-  comment: string;
+export interface ModifyFieldRequest extends DBField {
+  // Inherits all fields from DBField
 }
 
 export interface ModifyFieldResponse {
@@ -110,26 +118,268 @@ export interface GetFieldsResponse {
   message: string;
 }
 
-export interface DBField {
-  id: number;
-  name: string;
-  type: number;
-  parent_type: number;
-  fixed_id: number;
-  um: number;
-  logic_state: number;
-  comment: string
-}
-
 export interface TempField extends DBField {
   QRef: number
 }
 
 //TYPES
 
+export interface DBType {
+  id: number;
+  name: string;
+  base_type: boolean;
+  locked: boolean;
+}
+
 export interface TypeDeps {
   name: string;
   type: number;
   fields: TempField[];
   deps: number[]
+}
+
+export interface RemoveTypeRequest {
+  id: number;
+}
+
+export interface RemoveTypeResponse {
+  result: any;
+  message: string;
+}
+
+//LOGIC STATES
+
+export interface DBLogicState {
+  id: number;
+  name: string;
+  value: string[];
+}
+
+export interface AddLogicStateRequest {
+  name: string;
+  value: string[];
+}
+
+export interface AddLogicStateResponse {
+  result: any;
+  message: string;
+}
+
+export interface ModifyLogicStateRequest extends DBLogicState {
+  // Inherits all fields from DBLogicState
+}
+
+export interface ModifyLogicStateResponse {
+  result: any;
+  message: string;
+}
+
+export interface RemoveLogicStateRequest {
+  id: number;
+}
+
+export interface RemoveLogicStateResponse {
+  result: any;
+  message: string;
+}
+
+//TEMPLATES
+
+export interface DBTemplate {
+  id: number;
+  name: string;
+}
+
+export interface AddTemplateRequest {
+  name: string;
+}
+
+export interface AddTemplateResponse {
+  result: number;
+  message: string;
+}
+
+export interface ModifyTemplateRequest extends DBTemplate {
+  // Inherits all fields from DBTemplate
+}
+
+export interface ModifyTemplateResponse {
+  result: any;
+  message: string;
+}
+
+export interface GetTemplatesRequest {
+  // No parameters needed for this request
+}
+
+export interface GetTemplatesResponse {
+  result: any[];
+  message: string;
+}
+
+export interface RemoveTemplateRequest {
+  id: number;
+}
+
+export interface RemoveTemplateResponse {
+  result: any;
+  message: string;
+}
+
+//UNITS OF MEASURE
+
+export interface DBUm {
+  id: number;
+  name: string;
+  metric: string;
+  imperial: string;
+  gain: number;
+  offset: number;
+}
+
+export interface AddUmRequest {
+  name: string;
+  metric: string;
+  imperial: string;
+  gain: number;
+  offset: number;
+}
+
+export interface AddUmResponse {
+  result: any;
+  message: string;
+}
+
+export interface ModifyUmRequest extends DBUm {
+  // Inherits all fields from DBUm
+}
+
+export interface ModifyUmResponse {
+  result: any;
+  message: string;
+}
+
+export interface RemoveUmRequest {
+  id: number;
+}
+
+export interface RemoveUmResponse {
+  result: any;
+  message: string;
+}
+
+//USERS
+
+export interface DBUser {
+  id: number;
+  email: string;
+  name: string;
+  picture: string;
+  role: 'admin' | 'user';
+}
+
+export interface GetUsersRequest {
+  // No parameters needed for this request
+}
+
+export interface GetUsersResponse {
+  result: any[];
+  message: string;
+}
+
+export interface ModifyUserRequest {
+  id: number;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+}
+
+export interface ModifyUserResponse {
+  result: any;
+  message: string;
+}
+
+export interface RemoveUserRequest {
+  id: number;
+}
+
+export interface RemoveUserResponse {
+  result: any;
+  message: string;
+}
+
+//VARS
+
+export interface DBVar {
+  id: number;
+  type: number;
+  name: string;
+  template: number;
+  fixed_id: number;
+  um: number | null;
+  logic_state: number | null;
+  comment: string | null;
+}
+
+export interface ModifyVarRequest extends DBVar {
+  // Inherits all fields from DBVar
+}
+export interface ModifyVarResponse {
+  result: any;
+  message: string;
+}
+
+//TAGS
+
+export interface DBTag {
+  id: number;
+  name: string;
+  device: number;
+  var: number;
+  parent_tag: number | null;
+  type_field: number | null;
+  um: number | null;
+  logic_state: number | null;
+  comment: string | null;
+  value: any;
+  fixed_id: number;
+}
+
+export interface ModifyTagRequest extends DBTag {
+  // Inherits all fields from DBTag
+}
+
+export interface ModifyTagResponse {
+  result: any;
+  message: string;
+}
+
+//CONTROLS
+
+export interface Control {
+  device: number;
+  id: number;
+  name: string;
+  um: number | null;
+  logic_state: number | null;
+  fixed_id: number | null;
+  comment: string | null;
+  fields: Record<string, number | null>;
+}
+
+export interface Controls {
+    [controlName: string]: Control;
+}
+
+export interface GetAllControlsResult {
+  [deviceName: string]: Controls;
+}
+
+export interface GetAllControlsRequest {
+  // No parameters needed for this request
+}
+
+export interface GetAllControlsResponse {
+  result: GetAllControlsResult;
+  message: string;
 }

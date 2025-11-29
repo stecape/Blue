@@ -4,7 +4,7 @@ exports.default = default_1;
 // Init DB with tables and triggers
 function default_1(client) {
     return new Promise((innerResolve, innerReject) => {
-        var queryString = `
+        const queryString = `
   
     -- In futuro si userà ENUM('google', 'apple', 'microsoft', 'local');
 

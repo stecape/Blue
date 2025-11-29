@@ -34,7 +34,7 @@ export default function (app, pool) {
     var varFixedId = req.body.fixed_id;
 
     // Retreiving the typesList
-    var queryString = `SELECT * from "Type"`;
+    const queryString = `SELECT * from "Type"`;
     pool.query({
       text: queryString,
       rowMode: 'array',
@@ -96,7 +96,7 @@ export default function (app, pool) {
     var varFixedId = req.body.fixed_id;
 
     // Retreiving the typesList
-    var queryString = `SELECT * from "Type"`;
+    const queryString = `SELECT * from "Type"`;
     pool.query({
       text: queryString,
       rowMode: 'array',
@@ -146,7 +146,7 @@ export default function (app, pool) {
   Err:    400
   */
   app.post('/api/removeVar', isAdmin, (req, res) => {
-    var queryString=`DELETE FROM "Var" WHERE id = ${req.body.id};`
+    const queryString=`DELETE FROM "Var" WHERE id = ${req.body.id};`
     pool.query({
       text: queryString,
       rowMode: 'array'

@@ -39,7 +39,7 @@ export default function (app, pool) {
   Err:    400
   */
   app.post('/api/exec', isAdmin, (req, res) => {
-    var queryString=req.body.query
+    const queryString=req.body.query
     console.log(queryString)
     pool.query({
       text: queryString,
@@ -72,7 +72,7 @@ export default function (app, pool) {
   Err:    400
   */
   app.post('/api/getAll', isAuthenticated, (req, res) => {
-    var queryString=`SELECT ${req.body.fields.join(',')} FROM "${req.body.table}" ORDER BY id ASC`
+    const queryString=`SELECT ${req.body.fields.join(',')} FROM "${req.body.table}" ORDER BY id ASC`
     //console.log(queryString)
     pool.query({
       text: queryString,

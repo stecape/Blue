@@ -1,7 +1,9 @@
 // Init DB with tables and triggers
-export default function (client) {
+import { Pool, PoolClient } from 'pg'
+
+export default function (client: PoolClient): Promise<void> {
   return new Promise((innerResolve, innerReject) => {
-    var queryString=`
+    const queryString=`
   
     -- In futuro si userà ENUM('google', 'apple', 'microsoft', 'local');
 
@@ -447,14 +449,11 @@ export default function (client) {
     CREATE OR REPLACE TRIGGER UserIdentitiesTruncatingTrigger AFTER TRUNCATE ON "User_Identities" FOR EACH STATEMENT EXECUTE PROCEDURE return_data();
     `
 
-  client.query({
-      text: queryString
-    })
-    .then(() => {innerResolve()})
+  client.query(queryString)
+    .then(() => innerResolve())
     .catch(err => {
       console.log("Error during DB initialization")
       innerReject(err)
     })
-    
   })
 }

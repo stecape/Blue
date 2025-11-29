@@ -46,23 +46,23 @@ function initialize(pool: Pool) {
         })
       }
 
-      db_filler(client)
-        .then(() => {
-          initializePromise = null; // Resetta la Promise condivisa
-          if (client) {
+      if (client) {
+        db_filler(client)
+          .then(() => {
+            initializePromise = null; // Resetta la Promise condivisa
             resolve(client);
-          } else {
-            reject(new Error("Pool connected but client is undefined"));
-          }
-        })
-        .catch((err) => {
-          console.error("Initialize: Error filling the database", err);
-          if (client) client.release(true); // Rilascia il client e rimuovilo dal pool
-          dbConnected = false;
-          globalEventEmitter.emit('dbDisconnected'); // Emit the dbDisconnected event
-          initializePromise = null; // Resetta la Promise condivisa
-          setTimeout(() => initialize(pool).then(resolve).catch(reject), 5000); // Retry after 5 seconds
-        });
+          })
+          .catch((err) => {
+            console.error("Initialize: Error filling the database", err);
+            client.release(true); // Rilascia il client e rimuovilo dal pool
+            dbConnected = false;
+            globalEventEmitter.emit('dbDisconnected'); // Emit the dbDisconnected event
+            initializePromise = null; // Resetta la Promise condivisa
+            setTimeout(() => initialize(pool).then(resolve).catch(reject), 5000); // Retry after 5 seconds
+          });
+      } else {
+        reject(new Error("Pool connected but client is undefined"));
+      }
     });
 
     // Gestisci errori imprevisti sul pool (registra solo una volta)

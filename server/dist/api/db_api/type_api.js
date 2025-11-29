@@ -22,7 +22,7 @@ function default_1(app, pool) {
     Err:    400
     */
     app.post('/api/removeType', auth_api_js_1.isAdmin, (req, res) => {
-        var queryString = `DELETE FROM "Field" WHERE parent_type = ${req.body.id}; DELETE FROM "Type" WHERE id = ${req.body.id}`;
+        const queryString = `DELETE FROM "Field" WHERE parent_type = ${req.body.id}; DELETE FROM "Type" WHERE id = ${req.body.id}`;
         pool.query({
             text: queryString,
             rowMode: 'array'
