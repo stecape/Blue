@@ -2,8 +2,16 @@ import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
 import { Application, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { isAdmin } from '../auth_api.js';
-import { ErrorResponse, AddFieldRequest, AddFieldResponse, ModifyFieldRequest, ModifyFieldResponse, GetFieldsRequest, GetFieldsResponse, DBField, TempField, TypeDeps, TypeParentPairObj } from 'shared/types';
+import { ErrorResponse, AddFieldRequest, AddFieldResponse, ModifyFieldRequest, ModifyFieldResponse, GetFieldsRequest, GetFieldsResponse, DBField, TempField, TypeDeps } from 'shared/types';
 
+// Types and interfaces definition
+type TypeParentPairObj = { id: number; parent_type: number };
+
+type Graph = Record<number, number[]>;
+
+type TypesWithoutParent = { parent_type: number };
+
+// API implementation
 export default function (app: Application, pool: Pool) {
   /*
   Add a Field
@@ -49,27 +57,31 @@ export default function (app: Application, pool: Pool) {
   // The DFS function is called recursively for each parent type ID that has not been visited yet
   // The visited set is updated with each visited node, and the depth counter is decremented when returning from the recursion
   // The final result is a set of all visited nodes, which represents the dependencies tree of the given type ID
-  const DFS = (graph, typeId, visited = undefined, depthCounter = undefined) => {
+
+  const DFS = (graph: Graph, typeId: number, visited: Set<number> | undefined = undefined, depthCounter: number | undefined = undefined): Set<number> => {
     if (visited == undefined) {
-      visited = new Set()
+      visited = new Set<number>();
     }
     if (depthCounter == undefined) {
-      depthCounter = 0
+      depthCounter = 0;
     }
-    visited.add(typeId)
-    depthCounter++
-    graph[typeId]
-      .filter((item) => !visited.has(item))
-      .forEach((parent) => DFS(graph, parent, visited, depthCounter))
-    depthCounter--
+    visited.add(typeId);
+    depthCounter++;
+    if (graph[typeId]) {
+      graph[typeId]
+        .filter((item) => !visited.has(item))
+        .forEach((parent) => DFS(graph, parent, visited, depthCounter));
+    }
+    depthCounter--;
     if (depthCounter == 0) {
-      return visited
+      return visited;
     }
+    return visited;
   }
 
   const getDeps = (type: number) => {
     //This method, given a type ID, returns the dependencies tree of a type.
-    return new Promise((resolve, reject) => {
+    return new Promise<TypeDeps>((resolve, reject) => {
       // response struct preset
       var response: TypeDeps;
       var result: TypeParentPairObj[];
@@ -154,8 +166,9 @@ export default function (app: Application, pool: Pool) {
           });
         })
         .then((data) => {
+          const highestTypes: TypesWithoutParent[] = data.rows as TypesWithoutParent[];
           // Creating the Graph of the dependencies of the types
-          var graph: { [key: number]: number[] } = {};
+          var graph: Graph = {};
           /*
           For each row of the previous query, popolo la struttura graph. Result contiene i risultati della prima query. graph conterrà per ogni type tutti i parent type che dipendono da lui:
             graph = {
@@ -171,10 +184,9 @@ export default function (app: Application, pool: Pool) {
               595: []
             };
           */
-          result.forEach((k) => (graph[k.type] = result.filter((i) => i.type == k.type).map((j) => j.parent_type)));
-          data.rows.map((k) => (graph[k[0]] = []));
+          highestTypes.forEach((k) => (graph[k.parent_type] = []));
           // response.deps conterrà un array con gli ID di tutti i type che dipendono da uno specifico type. Ad esempio il graph nel commento di prima, DFS con type = 395, restituirà [395 396 592 594 595 593]
-          response.deps = [...DFS(graph, type)]; // Spread operator, DSF returns a Set, I want an array
+          response.deps = [...(DFS(graph, type) ?? [])]; // Spread operator, DSF returns a Set, I want an array. Fallback to empty array if undefined
           resolve(response);
         })
         .catch((error) => reject(error));

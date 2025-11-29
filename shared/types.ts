@@ -102,11 +102,11 @@ export interface ModifyFieldResponse {
 }
 
 export interface GetFieldsRequest {
-  // No parameters needed for this request
+  type: number;
 }
 
 export interface GetFieldsResponse {
-  result: any;
+  result: TypeDeps;
   message: string;
 }
 
@@ -131,12 +131,5 @@ export interface TypeDeps {
   name: string;
   type: number;
   fields: TempField[];
-  deps: any[]
+  deps: number[]
 }
-
-export interface TypeParentPairObj {
-  type: number;
-  parent_type: number;
-}
-
-export type TypeToDependentParentsMap = [number,  number[]][];
