@@ -439,3 +439,25 @@ export interface GetUserDeviceDetailsResponse {
   result: any;
   message: string;
 }
+
+//MQTT
+
+export interface MqttWriteRequest {
+  device: string;
+  id: number;
+  value: boolean | number | string;
+}
+
+export interface MqttWriteResponse {
+  result: any;
+  message: string;
+}
+
+export interface AlarmsAckRequest {
+  // No parameters needed for this request
+}
+
+export interface AlarmsAckResponse {
+  result: any;
+  message: string;
+}

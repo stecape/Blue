@@ -1,13 +1,17 @@
-import globalEventEmitter from '../Helpers/globalEventEmitter.js'
+import globalEventEmitter from '../Helpers/globalEventEmitter.js';
+import { Application, Request, Response } from 'express';
+import { Pool } from 'pg';
+import { ErrorResponse, MqttWriteRequest, MqttWriteResponse, AlarmsAckRequest, AlarmsAckResponse } from 'shared/types';
 import mqtt from 'mqtt'
 import { mqtt_client_id } from '../App/app_config.js'
 import { isAuthenticated } from './auth_api.js'
 
-export var mqttClient = {connected: false}
+import type { MqttClient } from 'mqtt';
+export let mqttClient: MqttClient;
 
-export default function (app, pool) {
+export default function (app: Application, pool: Pool) {
 
-  let devices = []
+  let devices: string[] = []
 
   mqttClient = mqtt.connect("mqtt://www.stecape.space:1883", {
     clientId: mqtt_client_id, // Opzionale: identificativo del client
@@ -99,8 +103,7 @@ export default function (app, pool) {
   })
   //
 
-  const mqttWrite = (device, command) => {
-    console.log(command)
+  const mqttWrite = (device: string, command: {id: number, value: boolean | number | string}) => {
     mqttClient.publish(`/command/${device}`, JSON.stringify(command))
   }
   
@@ -109,16 +112,17 @@ export default function (app, pool) {
   Type:   POST
   Route:  '/api/mqtt/write'
   Body:   {
+            device: "Device1",
             id: 45,
             value: 49.5
           }
   Res:    200
   Err:    400
   */
-  app.post('/api/mqtt/write', isAuthenticated, (req, res) => {
-    console.log({device: req.body.device, id:req.body.id, value:req.body.value})
-    mqttWrite(req.body.device, {id:req.body.id, value:req.body.value})
-    res.json({result: {device: req.body.device, id:req.body.id, value:req.body.value}, message: "Message sent"})
+  app.post('/api/mqtt/write', isAuthenticated, (req: Request<MqttWriteRequest>, res: Response<MqttWriteResponse | ErrorResponse>) => {
+    let reqBody: MqttWriteRequest = req.body
+    mqttWrite(reqBody.device, {id:reqBody.id, value:reqBody.value})
+    res.json({result: {device: reqBody.device, id:reqBody.id, value:reqBody.value}, message: "Message sent"})
   })
 
 /*
@@ -131,7 +135,7 @@ export default function (app, pool) {
           }
   Res:    200
   */
-  app.post('/api/mqtt/alarms_ack', isAuthenticated, (req, res) => {
+  app.post('/api/mqtt/alarms_ack', isAuthenticated, (req: Request<AlarmsAckRequest>, res: Response<AlarmsAckResponse | ErrorResponse>) => {
     devices.forEach(device => {
       mqttClient.publish(`/command/${device}`, JSON.stringify({id: 0, value: 4}))
     })
@@ -213,9 +217,7 @@ export default function (app, pool) {
           console.error("Invalid data format received:", data);
         }
       }
-    } catch (err) {
-      console.error("Failed to process MQTT message:", err.message, "Message:", message.toString());
-    }
+    } catch (err) {console.error("Failed to process MQTT message:", err, "Message:", message.toString())}
   });
 
   // Ascolta gli eventi emessi dalla CRUD API
