@@ -1,3 +1,8 @@
+//ALIASES
+
+export type Id = number;
+export type Name = string;
+
 //BACKEND
 
 // Estensione del tipo Request per includere req.user
@@ -22,6 +27,27 @@ export interface BackendStatusResult {
 
 export interface BackendStatusResponse {
   result: BackendStatusResult;
+  message: string;
+}
+
+//DB
+
+export interface ExecRequest {
+  query: string;
+}
+
+export interface ExecResponse {
+  result: any;
+  message: string;
+}
+
+export interface GetAllRequest {
+  table: string;
+  fields: string[];
+}
+
+export interface GetAllResponse {
+  result: any[];
   message: string;
 }
 
@@ -312,8 +338,8 @@ export interface RemoveUserResponse {
 
 export interface DBVar {
   id: number;
-  type: number;
   name: string;
+  type: number;
   template: number;
   fixed_id: number;
   um: number | null;
@@ -321,11 +347,22 @@ export interface DBVar {
   comment: string | null;
 }
 
-export interface ModifyVarRequest extends DBVar {
-  // Inherits all fields from DBVar
+export interface TempVar extends DBVar {
+  QRef: number;
 }
-export interface ModifyVarResponse {
-  result: any;
+
+export interface GetVarsRequest {
+  template: number;
+}
+
+export interface GetVarsResult {
+  name: string;
+  template: number;
+  vars: TempVar[];
+}
+
+export interface GetVarsResponse {
+  result: GetVarsResult;
   message: string;
 }
 
@@ -345,12 +382,20 @@ export interface DBTag {
   fixed_id: number;
 }
 
-export interface ModifyTagRequest extends DBTag {
-  // Inherits all fields from DBTag
+export interface DeleteTagsRequest {
+  // No parameters needed for this request
 }
 
-export interface ModifyTagResponse {
+export interface DeleteTagsResponse {
   result: any;
+  message: string;
+}
+
+export interface RefreshTagsRequest {
+  // No parameters needed for this request
+}
+
+export interface RefreshTagsResponse {
   message: string;
 }
 
@@ -381,5 +426,16 @@ export interface GetAllControlsRequest {
 
 export interface GetAllControlsResponse {
   result: GetAllControlsResult;
+  message: string;
+}
+
+//USER APP
+
+export interface GetUserDeviceDetailsRequest {
+  deviceId: number;
+}
+
+export interface GetUserDeviceDetailsResponse {
+  result: any;
   message: string;
 }

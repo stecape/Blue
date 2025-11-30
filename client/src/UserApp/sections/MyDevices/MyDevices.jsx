@@ -16,7 +16,7 @@ const MyDevices = () => {
     try {
       setLoading(true)
       const response = await axios.post('/api/user/devices')
-      setDevices(response.data.devices)
+      setDevices(response.data.result)
       setError(null)
     } catch (err) {
       console.error('Error fetching devices:', err)
