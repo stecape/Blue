@@ -1,4 +1,4 @@
-import EventEmitter from 'events'
+import EventEmitter from 'events';
 class _Emitter extends EventEmitter {}
-const globalEventEmitter = new _Emitter()
-export default globalEventEmitter
+const globalEventEmitter = new _Emitter();
+export default globalEventEmitter;

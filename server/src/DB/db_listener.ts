@@ -1,30 +1,28 @@
-
 import { PoolClient, Notification } from 'pg';
 import globalEventEmitter from '../Helpers/globalEventEmitter'; // Import globalEventEmitter
 
-
 export default function (client: PoolClient) {
   return new Promise((innerResolve, innerReject) => {
-
     // Designate which channels we are listening on. Add additional channels with multiple lines.
-    client.query('LISTEN changes')
+    client
+      .query('LISTEN changes')
       .then(() => {
-        console.log("DB Listener - LISTEN for DB changes")
-        innerResolve(client) // Resolve the promise after successful subscription
+        console.log('DB Listener - LISTEN for DB changes');
+        innerResolve(client); // Resolve the promise after successful subscription
       })
       .catch((err) => {
-        console.log("DB Listener - LISTEN error", err)
-        client.release(true) // Close the client connection
-        innerReject(err) // Reject the promise
-      })
+        console.log('DB Listener - LISTEN error', err);
+        client.release(true); // Close the client connection
+        innerReject(err); // Reject the promise
+      });
 
-      // Listen for all pg_notify channel messages and loggin them
-      client.on('notification', function (msg: Notification) {
-        if (msg.payload ){
-          let payload = JSON.parse(msg.payload);
-          //console.log(payload);
-          globalEventEmitter.emit('update', payload);
-        }
-      })
-  })
+    // Listen for all pg_notify channel messages and loggin them
+    client.on('notification', function (msg: Notification) {
+      if (msg.payload) {
+        let payload = JSON.parse(msg.payload);
+        //console.log(payload);
+        globalEventEmitter.emit('update', payload);
+      }
+    });
+  });
 }

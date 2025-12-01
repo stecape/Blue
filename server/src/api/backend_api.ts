@@ -5,30 +5,31 @@ import { Application, Request, Response } from 'express';
 import { BackendStatusResult, BackendStatusResponse } from 'shared/types';
 
 export default function (app: Application) {
-
   app.get('/', (req: Request, res: Response) => {
-    console.log('express connection')
-    res.status(200).send('<p>Express.js BackEnd Server. Ciao!</p>')
-  })
+    console.log('express connection');
+    res.status(200).send('<p>Express.js BackEnd Server. Ciao!</p>');
+  });
 
-  
   /*
-  * Get Backend Status
-  * This API returns the status of the backend
-  */
+   * Get Backend Status
+   * This API returns the status of the backend
+   */
 
   const result: BackendStatusResult = {
-      dbConnected: dbConnected,
-      mqttConnected: mqttClient.connected
-  }
+    dbConnected: dbConnected,
+    mqttConnected: mqttClient.connected,
+  };
 
   const response: BackendStatusResponse = {
-      result: result,
-      message: "Backend Status retrieved"
-  }
+    result: result,
+    message: 'Backend Status retrieved',
+  };
 
-  app.post('/api/getBackendStatus', isAuthenticated, (req: Request, res: Response<BackendStatusResponse>) => {
-    res.json(response)
-  })
-
+  app.post(
+    '/api/getBackendStatus',
+    isAuthenticated,
+    (req: Request, res: Response<BackendStatusResponse>) => {
+      res.json(response);
+    },
+  );
 }

@@ -1,12 +1,19 @@
-import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
 import { Application, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { isAdmin } from '../auth_api.js';
-import { ErrorResponse, AddTemplateRequest, AddTemplateResponse, ModifyTemplateRequest, ModifyTemplateResponse, GetTemplatesRequest, GetTemplatesResponse, RemoveTemplateRequest, RemoveTemplateResponse } from 'shared/types';
+import {
+  ErrorResponse,
+  AddTemplateRequest,
+  AddTemplateResponse,
+  ModifyTemplateRequest,
+  ModifyTemplateResponse,
+  GetTemplatesRequest,
+  GetTemplatesResponse,
+  RemoveTemplateRequest,
+  RemoveTemplateResponse,
+} from 'shared/types';
 
 export default function (app: Application, pool: Pool) {
-
-
   /**
    * Aggiungi un template
    * @route POST /api/addTemplate
@@ -18,13 +25,19 @@ export default function (app: Application, pool: Pool) {
    */
 
   // Aggiungi un template
-  app.post('/api/addTemplate', isAdmin, (req: Request<AddTemplateRequest>, res: Response<AddTemplateResponse | ErrorResponse>) => {
-    const queryString = `INSERT INTO "Template" (id, name) VALUES (DEFAULT, '${req.body.name}') RETURNING id`;
-    pool.query(queryString)
-    .then( data => res.json({ result: data.rows[0], message: "Template inserted" }))
-    .catch( error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
-
+  app.post(
+    '/api/addTemplate',
+    isAdmin,
+    (req: Request<AddTemplateRequest>, res: Response<AddTemplateResponse | ErrorResponse>) => {
+      const queryString = `INSERT INTO "Template" (id, name) VALUES (DEFAULT, '${req.body.name}') RETURNING id`;
+      pool
+        .query(queryString)
+        .then((data) => res.json({ result: data.rows[0], message: 'Template inserted' }))
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 
   /**
    * Modifica un template
@@ -38,13 +51,22 @@ export default function (app: Application, pool: Pool) {
    */
 
   // Modifica un template
-  app.post('/api/modifyTemplate', isAdmin, (req: Request<ModifyTemplateRequest>, res: Response<ModifyTemplateResponse | ErrorResponse>) => {
-    const queryString = `UPDATE "Template" SET name = '${req.body.name}', WHERE id = ${req.body.id}`;
-    pool.query(queryString)
-    .then( data => res.json({ result: data.rows[0], message: "Template updated" }))
-    .catch( error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
-
+  app.post(
+    '/api/modifyTemplate',
+    isAdmin,
+    (
+      req: Request<ModifyTemplateRequest>,
+      res: Response<ModifyTemplateResponse | ErrorResponse>,
+    ) => {
+      const queryString = `UPDATE "Template" SET name = '${req.body.name}', WHERE id = ${req.body.id}`;
+      pool
+        .query(queryString)
+        .then((data) => res.json({ result: data.rows[0], message: 'Template updated' }))
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 
   /**
    * Ottieni tutti i template
@@ -55,13 +77,21 @@ export default function (app: Application, pool: Pool) {
    */
 
   // Ottieni tutti i template
-  app.get('/api/getTemplates', isAdmin, (req: Request<GetTemplatesRequest>, res: Response<GetTemplatesResponse | ErrorResponse>) => {
-    const queryString = `SELECT * FROM "Template"`;
-    pool.query(queryString)
-    .then( data => { res.json({ result: data.rows, message: "Templates retrieved" }) })
-    .catch( error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
-
+  app.get(
+    '/api/getTemplates',
+    isAdmin,
+    (req: Request<GetTemplatesRequest>, res: Response<GetTemplatesResponse | ErrorResponse>) => {
+      const queryString = `SELECT * FROM "Template"`;
+      pool
+        .query(queryString)
+        .then((data) => {
+          res.json({ result: data.rows, message: 'Templates retrieved' });
+        })
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 
   /**
    * Elimina un template
@@ -74,20 +104,44 @@ export default function (app: Application, pool: Pool) {
    */
 
   // Elimina un template
-  app.post('/api/removeTemplate', isAdmin, (req: Request<RemoveTemplateRequest>, res: Response<RemoveTemplateResponse | ErrorResponse>) => {
-    const checkDevicesQuery = `SELECT COUNT(*) FROM "Device" WHERE template = ${req.body.id}`;
-    pool.query(checkDevicesQuery)
-    .then(data => {
-      if (parseInt(data.rows[0].count) > 0) {
-        res.status(400).json({ result: null, message: "Cannot delete template: it is referenced by one or more devices." });
-      } else {
-        const deleteTemplateQuery = `DELETE FROM "Template" WHERE id = ${req.body.id}`;
-        pool.query(deleteTemplateQuery)
-        .then(() => res.json({ result: null, message: "Template and associated Vars deleted successfully." }))
-        .catch( error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-      }
-    })
-    .catch( error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
-
+  app.post(
+    '/api/removeTemplate',
+    isAdmin,
+    (
+      req: Request<RemoveTemplateRequest>,
+      res: Response<RemoveTemplateResponse | ErrorResponse>,
+    ) => {
+      const checkDevicesQuery = `SELECT COUNT(*) FROM "Device" WHERE template = ${req.body.id}`;
+      pool
+        .query(checkDevicesQuery)
+        .then((data) => {
+          if (parseInt(data.rows[0].count) > 0) {
+            res
+              .status(400)
+              .json({
+                result: null,
+                message: 'Cannot delete template: it is referenced by one or more devices.',
+              });
+          } else {
+            const deleteTemplateQuery = `DELETE FROM "Template" WHERE id = ${req.body.id}`;
+            pool
+              .query(deleteTemplateQuery)
+              .then(() =>
+                res.json({
+                  result: null,
+                  message: 'Template and associated Vars deleted successfully.',
+                }),
+              )
+              .catch((error) =>
+                res
+                  .status(400)
+                  .json({ code: error.code, detail: error.detail, message: error.detail }),
+              );
+          }
+        })
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 }

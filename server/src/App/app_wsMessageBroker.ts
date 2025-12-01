@@ -1,7 +1,7 @@
 import globalEventEmitter from '../Helpers/globalEventEmitter.js'; // Import globalEventEmitter
-import { Server } from "socket.io"
+import { Server } from 'socket.io';
 
-export default function app_wsMessageBroker(connection : Server) {
+export default function app_wsMessageBroker(connection: Server) {
   // Listen for dbConnected event
   globalEventEmitter.on('dbConnected', () => {
     connection.emit('dbConnected');
@@ -24,6 +24,6 @@ export default function app_wsMessageBroker(connection : Server) {
 
   // Listen for update event
   globalEventEmitter.on('update', (payload) => {
-    connection.emit('update', payload)
+    connection.emit('update', payload);
   });
 }

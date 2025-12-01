@@ -2,11 +2,25 @@ import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
 import { Application, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { isAdmin } from '../auth_api.js';
-import { ErrorResponse, DeleteTagsRequest, DeleteTagsResponse, RefreshTagsRequest, RefreshTagsResponse, DBVar, DBType, DBField } from 'shared/types';
+import {
+  ErrorResponse,
+  DeleteTagsRequest,
+  DeleteTagsResponse,
+  RefreshTagsRequest,
+  RefreshTagsResponse,
+  DBVar,
+  DBType,
+  DBField,
+} from 'shared/types';
 
-type Graph = Record<number, number[]>
+type Graph = Record<number, number[]>;
 
-const DeleteTags = (pool: Pool, deviceIds: number[] = [], varIds: number[] = [], deviceId: number | null = null) => {
+const DeleteTags = (
+  pool: Pool,
+  deviceIds: number[] = [],
+  varIds: number[] = [],
+  deviceId: number | null = null,
+) => {
   return new Promise<void>((resolve, reject) => {
     let queryString = `DELETE FROM "Tag" WHERE 1=1`;
 
@@ -20,25 +34,35 @@ const DeleteTags = (pool: Pool, deviceIds: number[] = [], varIds: number[] = [],
       queryString += ` AND var IN (${varIds.join(',')})`;
     }
 
-    pool.query(queryString)
+    pool
+      .query(queryString)
       .then(() => {
-        console.log("Tags deleted");
+        console.log('Tags deleted');
         resolve();
       })
       .catch((error) => {
-        console.log("Error during tags deletion", error);
+        console.log('Error during tags deletion', error);
         reject(error);
       });
   });
 };
 
-const _GenerateTags = (pool: Pool, varId: number, deviceId: number, name: string, type: number, typesList: DBType[], fieldsList: DBField[], parent_tag: number, fixedIdPath: number[] = []) => {
-
+const _GenerateTags = (
+  pool: Pool,
+  varId: number,
+  deviceId: number,
+  name: string,
+  type: number,
+  typesList: DBType[],
+  fieldsList: DBField[],
+  parent_tag: number,
+  fixedIdPath: number[] = [],
+) => {
   // Filtra i campi figli per il tipo corrente
   const childFields = fieldsList.filter((field) => field.parent_type === type);
 
   if (!Array.isArray(childFields) || childFields.length === 0) {
-    console.error("No child fields found or fieldsList is not an array for type:", type);
+    console.error('No child fields found or fieldsList is not an array for type:', type);
     return;
   }
 
@@ -46,7 +70,7 @@ const _GenerateTags = (pool: Pool, varId: number, deviceId: number, name: string
     const tagName = `${name}.${f.name}`;
     // Costruisci la path dei fixed_id (Var + Field)
     const newFixedIdPath = [...fixedIdPath, f.fixed_id];
-    let fixedIdStr = newFixedIdPath.map(id => id.toString(7).padStart(2, '0')).join('');
+    let fixedIdStr = newFixedIdPath.map((id) => id.toString(7).padStart(2, '0')).join('');
     fixedIdStr = fixedIdStr.padEnd(18, '0');
     // Converti la stringa in base 7 in uint64 (assumiamo sempre che rientri in Number)
     let fixedIdValue = Number(BigInt(parseInt(fixedIdStr, 7)));
@@ -60,24 +84,39 @@ const _GenerateTags = (pool: Pool, varId: number, deviceId: number, name: string
         ${f.comment !== undefined ? `'${f.comment}'` : 'NULL'})
       RETURNING "id"
     `;
-    console.log("Executing query:", queryString);
-    pool.query(queryString)
+    console.log('Executing query:', queryString);
+    pool
+      .query(queryString)
       .then((data) => {
         const newParentTagId = data.rows[0].id;
         const _base_type = typesList.find((i) => i.id === f.type)?.base_type;
         if (!_base_type) {
-          _GenerateTags(pool, varId, deviceId, tagName, f.type, typesList, fieldsList, newParentTagId, newFixedIdPath);
+          _GenerateTags(
+            pool,
+            varId,
+            deviceId,
+            tagName,
+            f.type,
+            typesList,
+            fieldsList,
+            newParentTagId,
+            newFixedIdPath,
+          );
         }
       })
       .catch((error) => {
-        console.error("Error generating tags:", error);
+        console.error('Error generating tags:', error);
       });
   });
 };
 
-const GenerateTags = (pool: Pool, templateId?: number | null, typeId?: number | null, deviceId?: number | null) => {
+const GenerateTags = (
+  pool: Pool,
+  templateId?: number | null,
+  typeId?: number | null,
+  deviceId?: number | null,
+) => {
   return new Promise<void>((resolve, reject) => {
-    
     let deviceQuery: string = '';
 
     let deviceIds: number[] = [];
@@ -104,7 +143,8 @@ const GenerateTags = (pool: Pool, templateId?: number | null, typeId?: number | 
       deviceQuery = `SELECT DISTINCT "Device".id FROM "Device"`;
     }
 
-    pool.query(deviceQuery)
+    pool
+      .query(deviceQuery)
       .then((deviceData) => {
         deviceIds = deviceData.rows.map((row) => row.id);
 
@@ -141,7 +181,7 @@ const GenerateTags = (pool: Pool, templateId?: number | null, typeId?: number | 
         const varIds = filteredVars.map((v) => v.id);
 
         // Elimina le tag coinvolte
-        return DeleteTags(pool, deviceIds, varIds, deviceId ).then(() => ({
+        return DeleteTags(pool, deviceIds, varIds, deviceId).then(() => ({
           deviceIds,
           filteredVars,
         }));
@@ -156,14 +196,25 @@ const GenerateTags = (pool: Pool, templateId?: number | null, typeId?: number | 
 
             // Inserisce la prima tag associata alla variabile
             const insertQuery = `INSERT INTO "Tag" (id, name, device, var, parent_tag, type_field, um, logic_state, comment, fixed_id) VALUES (DEFAULT, '${v.name}', ${currentDeviceId}, ${v.id}, NULL, NULL, ${v.um !== undefined ? v.um : 'NULL'}, ${v.logic_state !== undefined ? v.logic_state : 'NULL'}, ${v.comment !== undefined ? `'${v.comment}'` : 'NULL'}, ${fixedIdValue}) RETURNING "id"`;
-            return pool.query(insertQuery)
-              .then((insertData) => {
-                const parentTagId: number = insertData.rows[0].id;
-                const _base_type: boolean | undefined = typesList.find(i => i.id === v.type)?.base_type;
-                if (!_base_type) {
-                  _GenerateTags(pool, v.id, currentDeviceId, v.name, v.type, typesList, fieldsList, parentTagId, [v.fixed_id]);
-                }
-              });
+            return pool.query(insertQuery).then((insertData) => {
+              const parentTagId: number = insertData.rows[0].id;
+              const _base_type: boolean | undefined = typesList.find(
+                (i) => i.id === v.type,
+              )?.base_type;
+              if (!_base_type) {
+                _GenerateTags(
+                  pool,
+                  v.id,
+                  currentDeviceId,
+                  v.name,
+                  v.type,
+                  typesList,
+                  fieldsList,
+                  parentTagId,
+                  [v.fixed_id],
+                );
+              }
+            });
           });
         });
 
@@ -195,8 +246,6 @@ const DFS = (graph: Graph, typeId: number, visited = new Set<number>()) => {
 };
 
 export default function (app: Application, pool: Pool) {
-
-
   /**
    * Elimina tag dal database in base a device, variabili o deviceId
    * @route POST /api/deleteTags
@@ -209,13 +258,18 @@ export default function (app: Application, pool: Pool) {
    * @param {Object} res - La risposta HTTP
    * @returns {Object} Messaggio di conferma dell'eliminazione
    */
-  app.post('/api/deleteTags', isAdmin, (req: Request<DeleteTagsRequest>, res: Response<DeleteTagsResponse | ErrorResponse>) => {
-    const { deviceIds = [], varIds = [], deviceId = null } = req.body;
-    DeleteTags(pool, deviceIds, varIds, deviceId )
-      .then(data => res.json({ result: data, message: "Query executed, tags deleted" }))
-      .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
-
+  app.post(
+    '/api/deleteTags',
+    isAdmin,
+    (req: Request<DeleteTagsRequest>, res: Response<DeleteTagsResponse | ErrorResponse>) => {
+      const { deviceIds = [], varIds = [], deviceId = null } = req.body;
+      DeleteTags(pool, deviceIds, varIds, deviceId)
+        .then((data) => res.json({ result: data, message: 'Query executed, tags deleted' }))
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 
   /**
    * Rigenera tutte le tag per i device/variabili specificati (refresh)
@@ -229,28 +283,34 @@ export default function (app: Application, pool: Pool) {
    * @param {Object} res - La risposta HTTP
    * @returns {Object} Messaggio di conferma del refresh
    */
-  app.post('/api/refreshTags', isAdmin, (req: Request<RefreshTagsRequest>, res: Response<RefreshTagsResponse | ErrorResponse>) => {
-    const { templateId = null, typeId = null, deviceId = null } = req.body;
+  app.post(
+    '/api/refreshTags',
+    isAdmin,
+    (req: Request<RefreshTagsRequest>, res: Response<RefreshTagsResponse | ErrorResponse>) => {
+      const { templateId = null, typeId = null, deviceId = null } = req.body;
 
-    GenerateTags(pool, templateId, typeId, deviceId )
-      .then(() => {
-        res.json({ message: "Tags refreshed successfully" });
-      })
-      .catch((error) => {
-        console.error(error);
-        if (!res.headersSent) {
-          res.status(400).json({ code: error.code, detail: error.detail, message: error.message });
-        }
-      });
-  });
+      GenerateTags(pool, templateId, typeId, deviceId)
+        .then(() => {
+          res.json({ message: 'Tags refreshed successfully' });
+        })
+        .catch((error) => {
+          console.error(error);
+          if (!res.headersSent) {
+            res
+              .status(400)
+              .json({ code: error.code, detail: error.detail, message: error.message });
+          }
+        });
+    },
+  );
 
   globalEventEmitter.on('refreshTags', (data) => {
     GenerateTags(pool, data)
       .then(() => {
-        console.log("Tags refreshed successfully via event");
+        console.log('Tags refreshed successfully via event');
       })
       .catch((error) => {
-        console.error("Error refreshing tags via event:", error);
+        console.error('Error refreshing tags via event:', error);
       });
   });
 }

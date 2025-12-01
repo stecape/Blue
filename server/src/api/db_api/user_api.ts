@@ -1,12 +1,17 @@
-import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
 import { Application, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { isAdmin } from '../auth_api.js';
-import { ErrorResponse, ModifyUserRequest, ModifyUserResponse, GetUsersRequest, GetUsersResponse, RemoveUserRequest, RemoveUserResponse } from 'shared/types';
+import {
+  ErrorResponse,
+  ModifyUserRequest,
+  ModifyUserResponse,
+  GetUsersRequest,
+  GetUsersResponse,
+  RemoveUserRequest,
+  RemoveUserResponse,
+} from 'shared/types';
 
 export default function (app: Application, pool: Pool) {
-
-
   /**
    * Ottieni tutti gli utenti
    * @route GET /api/getUsers
@@ -16,13 +21,19 @@ export default function (app: Application, pool: Pool) {
    */
 
   // Ottieni tutti gli utenti (solo admin)
-  app.get('/api/getUsers', isAdmin, (req: Request<GetUsersRequest>, res: Response<GetUsersResponse | ErrorResponse>) => {
-    const queryString = `SELECT id, email, name, picture, role FROM "User" ORDER BY id`;
-    pool.query(queryString)
-    .then(data => res.json({ result: data.rows, message: "Users retrieved" }))
-    .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
-
+  app.get(
+    '/api/getUsers',
+    isAdmin,
+    (req: Request<GetUsersRequest>, res: Response<GetUsersResponse | ErrorResponse>) => {
+      const queryString = `SELECT id, email, name, picture, role FROM "User" ORDER BY id`;
+      pool
+        .query(queryString)
+        .then((data) => res.json({ result: data.rows, message: 'Users retrieved' }))
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 
   /**
    * Modifica un utente
@@ -38,13 +49,19 @@ export default function (app: Application, pool: Pool) {
    */
 
   // Modifica un utente (solo admin)
-  app.post('/api/modifyUser', isAdmin, (req: Request<ModifyUserRequest>, res: Response<ModifyUserResponse | ErrorResponse>) => {
-    const queryString = `UPDATE "User" SET name = ${req.body.name}, email = ${req.body.email}, role = ${req.body.role} WHERE id = ${req.body.id} RETURNING id, email, name, role`;
-    pool.query(queryString)
-    .then(data => res.json({ result: data.rows[0], message: "User updated" }))
-    .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
-  
+  app.post(
+    '/api/modifyUser',
+    isAdmin,
+    (req: Request<ModifyUserRequest>, res: Response<ModifyUserResponse | ErrorResponse>) => {
+      const queryString = `UPDATE "User" SET name = ${req.body.name}, email = ${req.body.email}, role = ${req.body.role} WHERE id = ${req.body.id} RETURNING id, email, name, role`;
+      pool
+        .query(queryString)
+        .then((data) => res.json({ result: data.rows[0], message: 'User updated' }))
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 
   /**
    * Elimina un utente
@@ -57,11 +74,17 @@ export default function (app: Application, pool: Pool) {
    */
 
   // Elimina un utente (solo admin)
-  app.post('/api/removeUser', isAdmin, (req: Request<RemoveUserRequest>, res: Response<RemoveUserResponse | ErrorResponse>) => {
-    const queryString = `DELETE FROM "User" WHERE id = ${req.body.id}`;
-    pool.query(queryString)
-    .then( data => res.json({ result: data.rows[0], message: "User deleted" }))
-    .catch( error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }))
-  })
-
+  app.post(
+    '/api/removeUser',
+    isAdmin,
+    (req: Request<RemoveUserRequest>, res: Response<RemoveUserResponse | ErrorResponse>) => {
+      const queryString = `DELETE FROM "User" WHERE id = ${req.body.id}`;
+      pool
+        .query(queryString)
+        .then((data) => res.json({ result: data.rows[0], message: 'User deleted' }))
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 }

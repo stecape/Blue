@@ -1,8 +1,18 @@
-import globalEventEmitter from '../../Helpers/globalEventEmitter.js';
 import { Application, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { isAdmin } from '../auth_api.js';
-import { ErrorResponse, AddFieldRequest, AddFieldResponse, ModifyFieldRequest, ModifyFieldResponse, GetFieldsRequest, GetFieldsResponse, DBField, TempField, TypeDeps } from 'shared/types';
+import {
+  ErrorResponse,
+  AddFieldRequest,
+  AddFieldResponse,
+  ModifyFieldRequest,
+  ModifyFieldResponse,
+  GetFieldsRequest,
+  GetFieldsResponse,
+  DBField,
+  TempField,
+  TypeDeps,
+} from 'shared/types';
 
 // Types and interfaces definition
 type TypeParentPairObj = { id: number; parent_type: number };
@@ -29,13 +39,20 @@ export default function (app: Application, pool: Pool) {
    * @param {Object} res - La risposta HTTP
    * @returns {Object} L'ID del campo aggiunto e un messaggio di conferma
    */
-  app.post('/api/addField', isAdmin, (req: Request<AddFieldRequest>, res: Response<AddFieldResponse | ErrorResponse>) => {
-    const { name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
-    const queryString = `INSERT INTO "Field" (name, type, parent_type, fixed_id, um, logic_state, comment) VALUES ('${name}', ${type}, ${parent_type}, ${fixed_id}, ${um}, ${logic_state}, '${comment}') RETURNING id`;
-    pool.query(queryString)
-      .then(data => res.json({ result: data.rows[0].id, message: "Field added" }))
-      .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
+  app.post(
+    '/api/addField',
+    isAdmin,
+    (req: Request<AddFieldRequest>, res: Response<AddFieldResponse | ErrorResponse>) => {
+      const { name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
+      const queryString = `INSERT INTO "Field" (name, type, parent_type, fixed_id, um, logic_state, comment) VALUES ('${name}', ${type}, ${parent_type}, ${fixed_id}, ${um}, ${logic_state}, '${comment}') RETURNING id`;
+      pool
+        .query(queryString)
+        .then((data) => res.json({ result: data.rows[0].id, message: 'Field added' }))
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 
   /**
    * Modifica un campo (Field)
@@ -54,13 +71,20 @@ export default function (app: Application, pool: Pool) {
    * @param {Object} res - La risposta HTTP
    * @returns {Object} Messaggio di conferma
    */
-  app.post('/api/modifyField', isAdmin, (req: Request<ModifyFieldRequest>, res: Response<ModifyFieldResponse | ErrorResponse>) => {
-    const { id, name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
-    const queryString = `UPDATE "Field" SET name = '${name}', type = ${type}, parent_type = ${parent_type}, fixed_id = ${fixed_id}, um = ${um}, logic_state = ${logic_state}, comment = '${comment}' WHERE id = ${id}`;
-    pool.query(queryString)
-      .then(data => res.json({ result: data.rows, message: "Field updated" }))
-      .catch(error => res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }));
-  });
+  app.post(
+    '/api/modifyField',
+    isAdmin,
+    (req: Request<ModifyFieldRequest>, res: Response<ModifyFieldResponse | ErrorResponse>) => {
+      const { id, name, type, parent_type, fixed_id, um, logic_state, comment } = req.body;
+      const queryString = `UPDATE "Field" SET name = '${name}', type = ${type}, parent_type = ${parent_type}, fixed_id = ${fixed_id}, um = ${um}, logic_state = ${logic_state}, comment = '${comment}' WHERE id = ${id}`;
+      pool
+        .query(queryString)
+        .then((data) => res.json({ result: data.rows, message: 'Field updated' }))
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 
   // DFS function to traverse the graph and find all dependencies
   // It uses a depth counter to keep track of the depth of the recursion
@@ -73,7 +97,12 @@ export default function (app: Application, pool: Pool) {
   // The visited set is updated with each visited node, and the depth counter is decremented when returning from the recursion
   // The final result is a set of all visited nodes, which represents the dependencies tree of the given type ID
 
-  const DFS = (graph: Graph, typeId: number, visited: Set<number> | undefined = undefined, depthCounter: number | undefined = undefined): Set<number> => {
+  const DFS = (
+    graph: Graph,
+    typeId: number,
+    visited: Set<number> | undefined = undefined,
+    depthCounter: number | undefined = undefined,
+  ): Set<number> => {
     if (visited == undefined) {
       visited = new Set<number>();
     }
@@ -92,7 +121,7 @@ export default function (app: Application, pool: Pool) {
       return visited;
     }
     return visited;
-  }
+  };
 
   const getDeps = (type: number) => {
     //This method, given a type ID, returns the dependencies tree of a type.
@@ -102,10 +131,11 @@ export default function (app: Application, pool: Pool) {
       var result: TypeParentPairObj[];
       // Type name query
       const queryString = `SELECT name FROM "Type" WHERE id = ${type}`;
-      pool.query({
-        text: queryString,
-        rowMode: 'array',
-      })
+      pool
+        .query({
+          text: queryString,
+          rowMode: 'array',
+        })
         .then((name) => {
           // Filling the response struct with the main type name
           response.name = name.rows[0][0];
@@ -126,8 +156,8 @@ export default function (app: Application, pool: Pool) {
               logic_state: field.logic_state,
               comment: field.comment,
               QRef: i,
-            }
-            return f
+            };
+            return f;
           });
           /*
           Questa query per ogni type, dato il type.id, per tutti e soli i fields di quel type, restituisce l'arrey delle coppie [type.id, field.parent_type], prese una volta sola (le coppie non si ripetono: se un type id è presente due volte in un parent type, viene considerato una volta sola. ES: type ambientContitions : {(act) temperature, (act) moisture})
@@ -149,7 +179,7 @@ export default function (app: Application, pool: Pool) {
           ORDER by id
           `;
           return pool.query({
-            text: queryString
+            text: queryString,
           });
         })
         .then((data) => {
@@ -203,7 +233,7 @@ export default function (app: Application, pool: Pool) {
         .catch((error) => reject(error));
     });
   };
-  
+
   /**
    * Ottieni i campi (Fields) e le dipendenze di un parent type
    * @route POST /api/getFields
@@ -226,12 +256,20 @@ export default function (app: Application, pool: Pool) {
    *   "message": "Record(s) from table 'Field' returned correctly"
    * }
    */
-  app.post('/api/getFields', isAdmin, (req: Request<GetFieldsRequest>, res: Response<GetFieldsResponse | ErrorResponse>) => {
-    getDeps(req.body.type)
-    .then(response => {
-      res.json({result: response, message: "Record(s) from table \"Field\" returned correctly"})
-    })
-    .catch(error => res.status(400).json({code: error.code, detail: error.detail, message: error.detail}))    
-  })
-
+  app.post(
+    '/api/getFields',
+    isAdmin,
+    (req: Request<GetFieldsRequest>, res: Response<GetFieldsResponse | ErrorResponse>) => {
+      getDeps(req.body.type)
+        .then((response) => {
+          res.json({
+            result: response,
+            message: 'Record(s) from table "Field" returned correctly',
+          });
+        })
+        .catch((error) =>
+          res.status(400).json({ code: error.code, detail: error.detail, message: error.detail }),
+        );
+    },
+  );
 }
