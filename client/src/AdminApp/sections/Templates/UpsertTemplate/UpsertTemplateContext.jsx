@@ -16,7 +16,7 @@ const UpsertTemplateContextProvider = ({ children }) => {
     varNameNotValid: false,
   });
 
-  const initUpsertTemplateContext = useCallback((templates) => {
+  const initUpsertTemplateContext = useCallback(() => {
     setUpsertTemplate({
       create: true,
       templateNameQuery: '',

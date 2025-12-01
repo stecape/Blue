@@ -83,7 +83,7 @@ function TemplateName(props) {
             className={formStyles.item}
             value={upsertTemplate.name}
             onChange={(e) => InlineValidation(e.target.value)}
-            onBlur={(e) => {
+            onBlur={() => {
               if (
                 prevName !== upsertTemplate.name &&
                 !upsertTemplate.templateNameNotValid

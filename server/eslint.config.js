@@ -2,8 +2,14 @@ import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import prettier from 'eslint-config-prettier';
+import { defineConfig, globalIgnores } from "eslint/config";
 
-export default [
+export default defineConfig([
+  globalIgnores([
+    "dist/",
+    "node_modules/",
+    "build/"
+  ], "Global Ignore Patterns"),
   {
     ...js.configs.recommended,
     languageOptions: {
@@ -39,4 +45,4 @@ export default [
     },
   },
   prettier,
-];
+]);

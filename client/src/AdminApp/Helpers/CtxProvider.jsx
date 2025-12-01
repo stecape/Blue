@@ -300,7 +300,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setTypes((prevTypes) => [...[]]);
+              setTypes(() => [...[]]);
               break;
 
             case 'UPDATE':
@@ -330,7 +330,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setFields((prevFields) => [...[]]);
+              setFields(() => [...[]]);
               break;
 
             case 'UPDATE':
@@ -360,7 +360,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setUms((prevUms) => [...[]]);
+              setUms(() => [...[]]);
               break;
 
             case 'UPDATE':
@@ -393,7 +393,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setLogicStates((prevLogicStates) => [...[]]);
+              setLogicStates(() => [...[]]);
               break;
 
             case 'UPDATE':
@@ -423,7 +423,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setVars((prevVars) => [...[]]);
+              setVars(() => [...[]]);
               break;
 
             case 'UPDATE':
@@ -453,7 +453,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setTags((prevTags) => [...[]]);
+              setTags(() => [...[]]);
               break;
 
             case 'UPDATE':
@@ -483,7 +483,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setUsers((prevUsers) => [...[]]);
+              setUsers(() => [...[]]);
               break;
 
             case 'UPDATE':
@@ -513,7 +513,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setDevices((prevDevices) => [...[]]);
+              setDevices(() => [...[]]);
               break;
 
             case 'UPDATE':
@@ -543,7 +543,7 @@ export const CtxProvider = ({ children }) => {
               break;
 
             case 'TRUNCATE':
-              setTemplates((prevTemplates) => [...[]]);
+              setTemplates(() => [...[]]);
               break;
 
             case 'UPDATE':

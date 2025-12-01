@@ -2,11 +2,7 @@ import { useState, useContext } from 'react';
 import { Button } from '@react-md/button';
 import DeleteUserPopup from './DeleteUserPopup';
 import UpsertUserPopup from './UpsertUserPopup';
-import {
-  DeleteFontIcon,
-  EditFontIcon,
-  AddFontIcon,
-} from '@react-md/material-icons';
+import { DeleteFontIcon, EditFontIcon } from '@react-md/material-icons';
 import { getApiUrl } from '../../Helpers/config';
 import {
   Table,

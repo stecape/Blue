@@ -199,14 +199,12 @@ function UmList() {
         offset={0.0}
         modalType="full-page"
         upsertUm={(data) => {
-          axios
-            .post(`${serverIp}/api/addUm`, data)
-            .then(
-              setCreateUmPopup((prevState) => ({
-                ...prevState,
-                visible: false,
-              })),
-            );
+          axios.post(`${serverIp}/api/addUm`, data).then(
+            setCreateUmPopup((prevState) => ({
+              ...prevState,
+              visible: false,
+            })),
+          );
         }}
         cancelCommand={() => {
           setCreateUmPopup((prevState) => ({ ...prevState, visible: false }));

@@ -79,7 +79,7 @@ function TypeName(props) {
             className={formStyles.item}
             value={upsertType.name}
             onChange={(e) => InlineValidation(e.target.value)}
-            onBlur={(e) => {
+            onBlur={() => {
               if (
                 prevName !== upsertType.name &&
                 !upsertType.typeNameNotValid

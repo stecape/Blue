@@ -174,14 +174,12 @@ function DevicesList() {
         name=""
         modalType="full-page"
         upsertDevice={(data) => {
-          axios
-            .post(`${serverIp}/api/addDevice`, data)
-            .then(
-              setCreateDevicePopup((prevState) => ({
-                ...prevState,
-                visible: false,
-              })),
-            );
+          axios.post(`${serverIp}/api/addDevice`, data).then(
+            setCreateDevicePopup((prevState) => ({
+              ...prevState,
+              visible: false,
+            })),
+          );
         }}
         cancelCommand={() => {
           setCreateDevicePopup((prevState) => ({

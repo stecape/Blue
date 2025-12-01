@@ -38,7 +38,7 @@ const MyDevices = () => {
     return (
       <div className="my-devices-empty">
         <h2>No devices assigned</h2>
-        <p>You don't have any devices assigned to your account yet.</p>
+        <p>You don&apos;t have any devices assigned to your account yet.</p>
       </div>
     );
   }

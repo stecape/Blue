@@ -6,8 +6,14 @@ import tsparser from '@typescript-eslint/parser';
 import react from 'eslint-plugin-react';
 import prettier from 'eslint-config-prettier';
 import babelParser from '@babel/eslint-parser';
+import { defineConfig, globalIgnores } from "eslint/config";
 
-export default [
+export default defineConfig([
+  globalIgnores([
+    "dist/",
+    "node_modules/",
+    "build/"
+  ], "Global Ignore Patterns"),
   {
     ...js.configs.recommended,
     languageOptions: {
@@ -25,6 +31,7 @@ export default [
         module: 'readonly',
         require: 'readonly',
         process: 'readonly',
+        alert: 'readonly',
       },
     },
   },
@@ -95,4 +102,4 @@ export default [
     },
   },
   prettier,
-];
+]);

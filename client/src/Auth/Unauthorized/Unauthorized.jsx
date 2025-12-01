@@ -30,7 +30,7 @@ const Unauthorized = () => {
             applicazione.
           </p>
           <p className={styles.subtitle}>
-            Contatta l'amministratore per richiedere l'accesso.
+            Contatta l&apos;amministratore per richiedere l&apos;accesso.
           </p>
         </div>
 

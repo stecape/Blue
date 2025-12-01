@@ -6,7 +6,6 @@ import {
   BatteryUnknownFontIcon,
   TransformFontIcon,
   ErrorFontIcon,
-  WhatshotSVGIcon,
   PeopleFontIcon,
 } from '@react-md/material-icons';
 import { ReactComponent as TrendSVGIcon } from './sections/Trend/Trend.svg';

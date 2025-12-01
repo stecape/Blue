@@ -185,15 +185,13 @@ function LogicStatesList() {
         value={Array(8).fill('')}
         modalType="full-page"
         upsertLogicState={(data) => {
-          axios
-            .post(`${serverIp}/api/addLogicState`, data)
-            .then(
-              setCreateLogicStatePopup((prevState) => ({
-                ...prevState,
-                visible: false,
-                value: Array(8).fill(''),
-              })),
-            );
+          axios.post(`${serverIp}/api/addLogicState`, data).then(
+            setCreateLogicStatePopup((prevState) => ({
+              ...prevState,
+              visible: false,
+              value: Array(8).fill(''),
+            })),
+          );
         }}
         cancelCommand={() => {
           setCreateLogicStatePopup((prevState) => ({
