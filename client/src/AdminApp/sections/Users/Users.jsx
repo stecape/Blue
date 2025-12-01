@@ -1,6 +1,6 @@
-import { Grid, GridCell } from '@react-md/utils'
-import UsersList from './UsersList'
-import gridStyles from "../../styles/Grid.module.scss"
+import { Grid, GridCell } from '@react-md/utils';
+import UsersList from './UsersList';
+import gridStyles from '../../styles/Grid.module.scss';
 
 function Users() {
   return (
@@ -11,7 +11,7 @@ function Users() {
         </GridCell>
       </Grid>
     </>
-  )
+  );
 }
 
-export default Users
+export default Users;

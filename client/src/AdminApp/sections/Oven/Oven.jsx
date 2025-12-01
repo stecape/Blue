@@ -1,15 +1,15 @@
-import React, { useContext } from "react";
+import React, { useContext } from 'react';
 import { Grid, GridCell } from '@react-md/utils';
 
-import { ctxData } from "../../Helpers/CtxProvider";
-import LogicSelection from "../../HMI/Components/LogicSelection/LogicSelection";
-import Set from "../../HMI/Components/Set/Set";
-import Act from "../../HMI/Components/Act/Act";
-import Pid from "../../HMI/Components/Pid/Pid";
-import Profile from "../../HMI/Components/Profile/Profile";
+import { ctxData } from '../../Helpers/CtxProvider';
+import LogicSelection from '../../HMI/Components/LogicSelection/LogicSelection';
+import Set from '../../HMI/Components/Set/Set';
+import Act from '../../HMI/Components/Act/Act';
+import Pid from '../../HMI/Components/Pid/Pid';
+import Profile from '../../HMI/Components/Profile/Profile';
 
-import gridStyles from "../../styles/Grid.module.scss";
-import styles from "./Oven.module.scss";
+import gridStyles from '../../styles/Grid.module.scss';
+import styles from './Oven.module.scss';
 
 function Oven() {
   const ctx = useContext(ctxData);
@@ -24,10 +24,16 @@ function Oven() {
             <LogicSelection ctrl={ctx.controls.Forno?.Mode} label="Mode" />
           </GridCell>
           <GridCell colSpan={4} className={gridStyles.item}>
-            <Set ctrl={ctx.controls.Forno.PowerReference} label="Power Reference" />
+            <Set
+              ctrl={ctx.controls.Forno.PowerReference}
+              label="Power Reference"
+            />
           </GridCell>
           <GridCell colSpan={4} className={gridStyles.item}>
-            <Set ctrl={ctx.controls.Forno.TemperatureReference} label="Temperature Reference" />
+            <Set
+              ctrl={ctx.controls.Forno.TemperatureReference}
+              label="Temperature Reference"
+            />
           </GridCell>
           {/* Profile Section */}
           <GridCell colSpan={12} className={gridStyles.item}>
@@ -35,7 +41,10 @@ function Oven() {
           </GridCell>
           {/* Fine Profile Section */}
           <GridCell colSpan={4} className={gridStyles.item}>
-            <Act ctrl={ctx.controls.Forno?.ActualTemperature} label="Actual Temperature" />
+            <Act
+              ctrl={ctx.controls.Forno?.ActualTemperature}
+              label="Actual Temperature"
+            />
           </GridCell>
           <GridCell colSpan={4} className={gridStyles.item}>
             <Act ctrl={ctx.controls.Forno?.ActualPower} label="Actual Power" />

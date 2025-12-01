@@ -1,7 +1,7 @@
-import { Grid, GridCell } from '@react-md/utils'
-import TemplatesList from './TemplatesList'
-import gridStyles from "../../styles/Grid.module.scss"
-import { UpsertTemplateContextProvider } from "./UpsertTemplate/UpsertTemplateContext"
+import { Grid, GridCell } from '@react-md/utils';
+import TemplatesList from './TemplatesList';
+import gridStyles from '../../styles/Grid.module.scss';
+import { UpsertTemplateContextProvider } from './UpsertTemplate/UpsertTemplateContext';
 
 function Templates() {
   return (
@@ -14,7 +14,7 @@ function Templates() {
         </GridCell>
       </Grid>
     </>
-  )
+  );
 }
 
-export default Templates
+export default Templates;

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import styles from "./Bar.module.scss";
+import { useState, useEffect } from 'react';
+import styles from './Bar.module.scss';
 
 function Bar(props) {
   // Stati per i valori calcolati
@@ -18,7 +18,10 @@ function Bar(props) {
     setMin(props.min);
 
     // Calcola la posizione della tacca del setpoint
-    const calculatedSetPointPosition = props.set !== undefined ? ((props.set - props.min) / (props.max - props.min)) * 100 : null;
+    const calculatedSetPointPosition =
+      props.set !== undefined
+        ? ((props.set - props.min) / (props.max - props.min)) * 100
+        : null;
 
     // Calcola la larghezza della barra (actWidth) e la posizione iniziale della barra (startPoint)
     let calculatedActWidth = 0;
@@ -34,11 +37,15 @@ function Bar(props) {
           calculatedStartPoint = 99; // fuori scala
         } else {
           if (props.act < 0) {
-            calculatedActWidth = ((0 - props.act) / (props.max - props.min)) * 100;
-            calculatedStartPoint = (props.act - props.min) / (props.max - props.min) * 100;
+            calculatedActWidth =
+              ((0 - props.act) / (props.max - props.min)) * 100;
+            calculatedStartPoint =
+              ((props.act - props.min) / (props.max - props.min)) * 100;
           } else {
-            calculatedActWidth = ((props.act - 0) / (props.max - props.min)) * 100;
-            calculatedStartPoint = (0 - props.min) / (props.max - props.min) * 100;
+            calculatedActWidth =
+              ((props.act - 0) / (props.max - props.min)) * 100;
+            calculatedStartPoint =
+              ((0 - props.min) / (props.max - props.min)) * 100;
           }
         }
       } else if (props.min >= 0 && props.max > 0) {
@@ -46,7 +53,8 @@ function Bar(props) {
           calculatedActWidth = 1; // fuori scala
           calculatedStartPoint = 0; // fuori scala
         } else {
-          calculatedActWidth = ((props.act - props.min) / (props.max - props.min)) * 100;
+          calculatedActWidth =
+            ((props.act - props.min) / (props.max - props.min)) * 100;
           calculatedStartPoint = 0;
         }
       } else if (props.min < 0 && props.max <= 0) {
@@ -54,14 +62,18 @@ function Bar(props) {
           calculatedActWidth = 1; // fuori scala
           calculatedStartPoint = 99; // fuori scala
         } else {
-          calculatedActWidth = ((props.max - props.act) / (props.max - props.min)) * 100;
+          calculatedActWidth =
+            ((props.max - props.act) / (props.max - props.min)) * 100;
           calculatedStartPoint = 100 - calculatedActWidth;
         }
       }
     }
 
     // Calcola la posizione dello zero
-    const calculatedZeroPosition = props.min < 0 && props.max > 0 ? `${(0 - props.min) / (props.max - props.min) * 100}%` : null;
+    const calculatedZeroPosition =
+      props.min < 0 && props.max > 0
+        ? `${((0 - props.min) / (props.max - props.min)) * 100}%`
+        : null;
 
     // Aggiorna gli stati calcolati
     setSetPointPosition(calculatedSetPointPosition);
@@ -96,10 +108,7 @@ function Bar(props) {
       <div className={styles.labels}>
         <span className={styles.min}>{min}</span>
         {min < 0 && max > 0 && (
-          <span
-            className={styles.zero}
-            style={{ left: zeroPosition }}
-          >
+          <span className={styles.zero} style={{ left: zeroPosition }}>
             0
           </span>
         )}

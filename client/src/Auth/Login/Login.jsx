@@ -1,8 +1,8 @@
-import { useAuth } from '../AuthContext.jsx'
-import styles from './Login.module.scss'
+import { useAuth } from '../AuthContext.jsx';
+import styles from './Login.module.scss';
 
 const Login = () => {
-  const { login, loading } = useAuth()
+  const { login, loading } = useAuth();
 
   if (loading) {
     return (
@@ -11,7 +11,7 @@ const Login = () => {
           <p>Caricamento...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -21,11 +21,8 @@ const Login = () => {
           <h1>Benvenuto</h1>
           <p>Accedi con il tuo account Google per continuare</p>
         </div>
-        
-        <button 
-          className={styles.googleButton}
-          onClick={login}
-        >
+
+        <button className={styles.googleButton} onClick={login}>
           <svg className={styles.googleIcon} viewBox="0 0 24 24">
             <path
               fill="#4285F4"
@@ -52,7 +49,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

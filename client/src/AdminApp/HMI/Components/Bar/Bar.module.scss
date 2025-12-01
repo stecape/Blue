@@ -17,7 +17,9 @@
   position: absolute; /* Necessario per usare left */
   background-color: rgb(116, 94, 47); /* Colore della barra */
   height: 100%; /* Assicura che la barra occupi tutta l'altezza */
-  transition: width 0.3s ease, left 0.3s ease; /* Transizione fluida */
+  transition:
+    width 0.3s ease,
+    left 0.3s ease; /* Transizione fluida */
 }
 
 .setpoint {

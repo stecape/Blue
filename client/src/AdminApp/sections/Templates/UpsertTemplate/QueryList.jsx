@@ -1,14 +1,16 @@
-import { useContext } from "react"
-import { List, ListItem } from "@react-md/list"
+import { useContext } from 'react';
+import { List, ListItem } from '@react-md/list';
 
-import { UpsertTemplateContext } from './UpsertTemplateContext'
+import { UpsertTemplateContext } from './UpsertTemplateContext';
 
-function QueryList () {
-  const {upsertTemplate} = useContext(UpsertTemplateContext)
+function QueryList() {
+  const { upsertTemplate } = useContext(UpsertTemplateContext);
 
   return (
     <List>
-      <ListItem key={`templateNameQuery`} id={`templateNameQuery`}>{upsertTemplate.templateNameQuery}</ListItem>
+      <ListItem key={`templateNameQuery`} id={`templateNameQuery`}>
+        {upsertTemplate.templateNameQuery}
+      </ListItem>
       {upsertTemplate.insertQuery.map((q, i) => (
         <ListItem key={`insertQuery_${i}`} id={`insertQuery_${i}`}>
           {q.query}
@@ -25,6 +27,6 @@ function QueryList () {
         </ListItem>
       ))}
     </List>
-  )
+  );
 }
-export default QueryList
+export default QueryList;

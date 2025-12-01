@@ -1,6 +1,6 @@
-import { Grid, GridCell } from '@react-md/utils'
-import VarsList from './VarsList'
-import gridStyles from "../../styles/Grid.module.scss"
+import { Grid, GridCell } from '@react-md/utils';
+import VarsList from './VarsList';
+import gridStyles from '../../styles/Grid.module.scss';
 
 function Vars() {
   return (
@@ -11,7 +11,7 @@ function Vars() {
         </GridCell>
       </Grid>
     </>
-  )
+  );
 }
 
-export default Vars
+export default Vars;

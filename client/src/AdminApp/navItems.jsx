@@ -1,5 +1,15 @@
-import { HomeFontIcon, AllOutFontIcon, SettingsInputComponentFontIcon, DevicesOtherFontIcon, BatteryUnknownFontIcon, TransformFontIcon, ErrorFontIcon, WhatshotSVGIcon, PeopleFontIcon } from "@react-md/material-icons";
-import { ReactComponent as TrendSVGIcon } from "./sections/Trend/Trend.svg";
+import {
+  HomeFontIcon,
+  AllOutFontIcon,
+  SettingsInputComponentFontIcon,
+  DevicesOtherFontIcon,
+  BatteryUnknownFontIcon,
+  TransformFontIcon,
+  ErrorFontIcon,
+  WhatshotSVGIcon,
+  PeopleFontIcon,
+} from '@react-md/material-icons';
+import { ReactComponent as TrendSVGIcon } from './sections/Trend/Trend.svg';
 
 /**
  * Note: The `parentId` **must** be defaulted to `null` for the navigation tree
@@ -7,12 +17,7 @@ import { ReactComponent as TrendSVGIcon } from "./sections/Trend/Trend.svg";
  * scenes. Each item that has a `parentId` set to `null` will appear at the root
  * level of your navigation tree.
  */
-function createRoute(
-  pathname,
-  children,
-  leftAddon,
-  parentId = null
-) {
+function createRoute(pathname, children, leftAddon, parentId = null) {
   return {
     itemId: pathname,
     parentId,
@@ -23,21 +28,31 @@ function createRoute(
 }
 
 const navItems = {
-  "/": createRoute("/", "Home", <HomeFontIcon />),
-  "/types": createRoute("/types", "Types", <AllOutFontIcon />),
-  "/um": createRoute("/um", "um", <TransformFontIcon />),
-  "/logicState": createRoute("/logicState", "Logic State", <TransformFontIcon />),
-  "/templates": createRoute("/templates", "Device Templates", <BatteryUnknownFontIcon />),
-  "/devices": createRoute("/devices", "Devices", <DevicesOtherFontIcon />),
-  "/users": createRoute("/users", "Users", <PeopleFontIcon />),
-  "/alarms": createRoute("/alarms", "Alarms", <ErrorFontIcon />),
-  "/tags": createRoute("/tags", "Tags", <SettingsInputComponentFontIcon />),
-  "/controls": createRoute("/controls", "Controls", <SettingsInputComponentFontIcon />),
-  "/trend": createRoute("/trend", "Trend", <TrendSVGIcon />),
+  '/': createRoute('/', 'Home', <HomeFontIcon />),
+  '/types': createRoute('/types', 'Types', <AllOutFontIcon />),
+  '/um': createRoute('/um', 'um', <TransformFontIcon />),
+  '/logicState': createRoute(
+    '/logicState',
+    'Logic State',
+    <TransformFontIcon />,
+  ),
+  '/templates': createRoute(
+    '/templates',
+    'Device Templates',
+    <BatteryUnknownFontIcon />,
+  ),
+  '/devices': createRoute('/devices', 'Devices', <DevicesOtherFontIcon />),
+  '/users': createRoute('/users', 'Users', <PeopleFontIcon />),
+  '/alarms': createRoute('/alarms', 'Alarms', <ErrorFontIcon />),
+  '/tags': createRoute('/tags', 'Tags', <SettingsInputComponentFontIcon />),
+  '/controls': createRoute(
+    '/controls',
+    'Controls',
+    <SettingsInputComponentFontIcon />,
+  ),
+  '/trend': createRoute('/trend', 'Trend', <TrendSVGIcon />),
 };
 
 export default navItems;
-
-
 
 //  "/oven": createRoute("/oven", "Oven", <WhatshotSVGIcon />),

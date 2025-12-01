@@ -1,6 +1,6 @@
-import { Grid, GridCell } from '@react-md/utils'
-import DevicesList from './DevicesList'
-import gridStyles from "../../styles/Grid.module.scss"
+import { Grid, GridCell } from '@react-md/utils';
+import DevicesList from './DevicesList';
+import gridStyles from '../../styles/Grid.module.scss';
 
 function Devices() {
   return (
@@ -11,7 +11,7 @@ function Devices() {
         </GridCell>
       </Grid>
     </>
-  )
+  );
 }
 
-export default Devices
+export default Devices;

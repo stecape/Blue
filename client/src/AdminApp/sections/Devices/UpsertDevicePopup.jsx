@@ -1,48 +1,59 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext } from 'react';
 import { AppBar, AppBarTitle, AppBarNav } from '@react-md/app-bar';
-import { Grid, GridCell } from '@react-md/utils'
-import { Button } from "@react-md/button"
-import { Dialog, DialogContent } from "@react-md/dialog"
+import { Grid, GridCell } from '@react-md/utils';
+import { Button } from '@react-md/button';
+import { Dialog, DialogContent } from '@react-md/dialog';
 import { ArrowBackFontIcon } from '@react-md/material-icons';
-import {
-  Form,
-  TextField,
-  FormThemeProvider,
-  Select
-} from '@react-md/form'
-import gridStyles from '../../styles/Grid.module.scss'
-import formStyles from '../../styles/Form.module.scss'
-import {ctxData} from "../../Helpers/CtxProvider"
+import { Form, TextField, FormThemeProvider, Select } from '@react-md/form';
+import gridStyles from '../../styles/Grid.module.scss';
+import formStyles from '../../styles/Form.module.scss';
+import { ctxData } from '../../Helpers/CtxProvider';
 
-function UpsertDevicePopup (props) {
+function UpsertDevicePopup(props) {
   const ctx = useContext(ctxData);
   const [modalState, setModalState] = useState({
     visible: false,
     name: '',
     modalType: props.modalType,
     template: 0,
-    user_id: 0
-  })
-  
+    user_id: 0,
+  });
+
   //Form Events
   const handleSubmit = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     props.upsertDevice({
       name: modalState.name,
       template: modalState.template,
-      user_id: modalState.user_id
-    })
-    setModalState((prevState) => ({ ...prevState, name: "", template: 0, user_id: 0}))
-  }
+      user_id: modalState.user_id,
+    });
+    setModalState((prevState) => ({
+      ...prevState,
+      name: '',
+      template: 0,
+      user_id: 0,
+    }));
+  };
   const handleReset = () => {
-    setModalState((prevState) => ({ ...prevState, name: "", template: 0, user_id: 0}))
-    props.cancelCommand()
-  }
+    setModalState((prevState) => ({
+      ...prevState,
+      name: '',
+      template: 0,
+      user_id: 0,
+    }));
+    props.cancelCommand();
+  };
 
   useEffect(() => {
-    setModalState((prevState) => ({ ...prevState, name: props.name, template: props.template, user_id: props.user_id, visible: props.visible}))
-  },[props.name, props.template, props.user_id, props.visible])
-  
+    setModalState((prevState) => ({
+      ...prevState,
+      name: props.name,
+      template: props.template,
+      user_id: props.user_id,
+      visible: props.visible,
+    }));
+  }, [props.name, props.template, props.user_id, props.visible]);
+
   return (
     <Dialog
       id="upsert-var-dialog"
@@ -52,27 +63,38 @@ function UpsertDevicePopup (props) {
       onRequestClose={props.cancelCommand}
       aria-labelledby="dialog-title"
     >
-    <AppBar id={`appbarT`} theme="primary" key="primary">
-      <AppBarNav onClick={handleReset} aria-label="Close">
-        <ArrowBackFontIcon />
-      </AppBarNav>
-      <AppBarTitle>{props.create ? "Creating Device" : "Modifying " + modalState.name}</AppBarTitle>
-    </AppBar>
+      <AppBar id={`appbarT`} theme="primary" key="primary">
+        <AppBarNav onClick={handleReset} aria-label="Close">
+          <ArrowBackFontIcon />
+        </AppBarNav>
+        <AppBarTitle>
+          {props.create ? 'Creating Device' : 'Modifying ' + modalState.name}
+        </AppBarTitle>
+      </AppBar>
       <DialogContent>
         <div className={formStyles.container}>
           <Grid>
             <GridCell colSpan={12} className={gridStyles.item}>
               <div className={formStyles.container}>
-                <FormThemeProvider theme='outline'>
-                  <Form className={formStyles.form} onSubmit={handleSubmit} onReset={handleReset}>
+                <FormThemeProvider theme="outline">
+                  <Form
+                    className={formStyles.form}
+                    onSubmit={handleSubmit}
+                    onReset={handleReset}
+                  >
                     <TextField
-                      id='name'
-                      key='name'
-                      type='string'
+                      id="name"
+                      key="name"
+                      type="string"
                       label="Device Name"
                       className={formStyles.item}
                       value={modalState.name}
-                      onChange={(e) => setModalState((prevState) => ({ ...prevState, name: e.target.value}))}
+                      onChange={(e) =>
+                        setModalState((prevState) => ({
+                          ...prevState,
+                          name: e.target.value,
+                        }))
+                      }
                     />
                     <Select
                       id="template"
@@ -95,7 +117,7 @@ function UpsertDevicePopup (props) {
                       id="user_id"
                       key="user_id"
                       options={ctx.users.map((item) => ({
-                        label: item.name + " " + item.email,
+                        label: item.name + ' ' + item.email,
                         value: item.id,
                       }))}
                       value={(modalState.user_id || 0).toString()}
@@ -115,7 +137,7 @@ function UpsertDevicePopup (props) {
                         themeType="outline"
                         className={formStyles.btn}
                       >
-                        {props.create ? "Create" : "Save"}
+                        {props.create ? 'Create' : 'Save'}
                       </Button>
                       <Button
                         type="reset"
@@ -131,8 +153,8 @@ function UpsertDevicePopup (props) {
             </GridCell>
           </Grid>
         </div>
-      </DialogContent>      
+      </DialogContent>
     </Dialog>
-  )
+  );
 }
-export default UpsertDevicePopup
+export default UpsertDevicePopup;

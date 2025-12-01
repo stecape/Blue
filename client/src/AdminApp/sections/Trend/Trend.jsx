@@ -1,13 +1,9 @@
-import { useContext, useEffect, useState, useRef } from "react"; // Aggiunto useRef
+import { useContext, useEffect, useState, useRef } from 'react'; // Aggiunto useRef
 import { Grid, GridCell } from '@react-md/utils';
-import { Button } from "@react-md/button"
-import { DialogContent, DialogFooter } from "@react-md/dialog"
-import { Typography } from "@react-md/typography";
-import {
-  Form,
-  FormThemeProvider,
-  Select
-} from '@react-md/form'
+import { Button } from '@react-md/button';
+import { DialogContent, DialogFooter } from '@react-md/dialog';
+import { Typography } from '@react-md/typography';
+import { Form, FormThemeProvider, Select } from '@react-md/form';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -19,9 +15,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import gridStyles from "../../styles/Grid.module.scss";
-import styles from "./Trend.module.scss";
-import { ctxData } from "../../Helpers/CtxProvider";
+import gridStyles from '../../styles/Grid.module.scss';
+import styles from './Trend.module.scss';
+import { ctxData } from '../../Helpers/CtxProvider';
 
 ChartJS.register(
   CategoryScale,
@@ -30,7 +26,7 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 const MAX_BUFFER = 1000;
@@ -76,11 +72,15 @@ function Trend() {
   };
 
   // Ottieni la lista delle tag di tipo base disponibili
-  const tags = ctx.tags.filter(t => {
-    const tag_type_field_type = ctx.fields.find(f => f.id === t.type_field)
-    if (!tag_type_field_type) return false; // Se non esiste il tipo di campo, salta questo tag
-    return ctx.types.find(ty => ty.id === tag_type_field_type.type)?.base_type === true
-  }) || [];
+  const tags =
+    ctx.tags.filter((t) => {
+      const tag_type_field_type = ctx.fields.find((f) => f.id === t.type_field);
+      if (!tag_type_field_type) return false; // Se non esiste il tipo di campo, salta questo tag
+      return (
+        ctx.types.find((ty) => ty.id === tag_type_field_type.type)
+          ?.base_type === true
+      );
+    }) || [];
   // Gestione polling
   useEffect(() => {
     if (!isRecording || !selectedTag) return;
@@ -88,38 +88,65 @@ function Trend() {
     if (timerRef.current) clearInterval(timerRef.current); // Cancella il timer precedente
 
     timerRef.current = setInterval(() => {
-      setUpdateTrigger(prev => !prev); // Cambia lo stato per forzare il re-render
+      setUpdateTrigger((prev) => !prev); // Cambia lo stato per forzare il re-render
     }, interval);
 
     return () => clearInterval(timerRef.current); // Pulisce il timer quando il componente si smonta o l'effetto si aggiorna
   }, [isRecording, selectedTag, interval]);
 
   // Reset dati quando cambio tag
-  useEffect(() => { setData([]); }, [selectedTag, interval]);
+  useEffect(() => {
+    setData([]);
+  }, [selectedTag, interval]);
 
   // Aggiorna i dati ogni volta che il trigger di aggiornamento cambia
   useEffect(() => {
     if (!isRecording || !selectedTag) return;
-    setData(prev => {
-      const value = ctx.tags.find(t => t.id === selectedTag.id)?.value?.value ?? 0;
-      const newEntry = { time: new Date().toLocaleTimeString('it-IT', { hour12: false }) + ':' + new Date().getMilliseconds(), value };
+    setData((prev) => {
+      const value =
+        ctx.tags.find((t) => t.id === selectedTag.id)?.value?.value ?? 0;
+      const newEntry = {
+        time:
+          new Date().toLocaleTimeString('it-IT', { hour12: false }) +
+          ':' +
+          new Date().getMilliseconds(),
+        value,
+      };
       const arr = [...prev, newEntry];
       return arr.length > MAX_BUFFER ? arr.slice(arr.length - MAX_BUFFER) : arr;
     });
     if (selectedTag2) {
-      setData2(prev => {
-        const value = ctx.tags.find(t => t.id === selectedTag2.id)?.value?.value ?? 0;
-        const newEntry = { time: new Date().toLocaleTimeString('it-IT', { hour12: false }) + ':' + new Date().getMilliseconds(), value };
+      setData2((prev) => {
+        const value =
+          ctx.tags.find((t) => t.id === selectedTag2.id)?.value?.value ?? 0;
+        const newEntry = {
+          time:
+            new Date().toLocaleTimeString('it-IT', { hour12: false }) +
+            ':' +
+            new Date().getMilliseconds(),
+          value,
+        };
         const arr = [...prev, newEntry];
-        return arr.length > MAX_BUFFER ? arr.slice(arr.length - MAX_BUFFER) : arr;
+        return arr.length > MAX_BUFFER
+          ? arr.slice(arr.length - MAX_BUFFER)
+          : arr;
       });
     }
     if (selectedTag3) {
-      setData3(prev => {
-        const value = ctx.tags.find(t => t.id === selectedTag3.id)?.value?.value ?? 0;
-        const newEntry = { time: new Date().toLocaleTimeString('it-IT', { hour12: false }) + ':' + new Date().getMilliseconds(), value };
+      setData3((prev) => {
+        const value =
+          ctx.tags.find((t) => t.id === selectedTag3.id)?.value?.value ?? 0;
+        const newEntry = {
+          time:
+            new Date().toLocaleTimeString('it-IT', { hour12: false }) +
+            ':' +
+            new Date().getMilliseconds(),
+          value,
+        };
         const arr = [...prev, newEntry];
-        return arr.length > MAX_BUFFER ? arr.slice(arr.length - MAX_BUFFER) : arr;
+        return arr.length > MAX_BUFFER
+          ? arr.slice(arr.length - MAX_BUFFER)
+          : arr;
       });
     }
   }, [updateTrigger, isRecording, selectedTag, selectedTag2, selectedTag3]);

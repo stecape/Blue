@@ -1,26 +1,28 @@
-import { useState, useEffect } from "react"
-import Bar from "../Bar/Bar"
-import { Typography } from "@react-md/typography"
-import { Dialog, DialogContent, DialogFooter } from "@react-md/dialog"
-import { Button } from "@react-md/button"
-import { TextField } from "@react-md/form"
-import styles from "./SetPopup.module.scss"
+import { useState, useEffect } from 'react';
+import Bar from '../Bar/Bar';
+import { Typography } from '@react-md/typography';
+import { Dialog, DialogContent, DialogFooter } from '@react-md/dialog';
+import { Button } from '@react-md/button';
+import { TextField } from '@react-md/form';
+import styles from './SetPopup.module.scss';
 
 export default function SetPopup(props) {
-  const [isDialogVisible, setDialogVisible] = useState(props.isDialogVisible ?? false)
+  const [isDialogVisible, setDialogVisible] = useState(
+    props.isDialogVisible ?? false,
+  );
   useEffect(() => {
-    setDialogVisible(props.isDialogVisible)
-  }, [props.isDialogVisible])
+    setDialogVisible(props.isDialogVisible);
+  }, [props.isDialogVisible]);
 
   const closeDialog = () => {
-    setDialogVisible(false)
-    if (props.closeDialog) props.closeDialog()
-  }
+    setDialogVisible(false);
+    if (props.closeDialog) props.closeDialog();
+  };
 
   const confirmValue = () => {
-    if (props.confirmValue) props.confirmValue()
-    setDialogVisible(false)
-  }
+    if (props.confirmValue) props.confirmValue();
+    setDialogVisible(false);
+  };
 
   return (
     <Dialog
@@ -43,7 +45,7 @@ export default function SetPopup(props) {
           max={props.max}
           className={styles.dialogInput}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === 'Enter') {
               confirmValue();
             }
           }}
@@ -57,5 +59,5 @@ export default function SetPopup(props) {
         </Button>
       </DialogFooter>
     </Dialog>
-  )
+  );
 }

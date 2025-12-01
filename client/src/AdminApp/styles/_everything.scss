@@ -1,5 +1,5 @@
-@use "@react-md/theme/dist/color-palette" as *;
-@forward "react-md" with (
+@use '@react-md/theme/dist/color-palette' as *;
+@forward 'react-md' with (
   $rmd-theme-light: false,
   $rmd-theme-dark-elevation: true,
   $rmd-theme-primary: $rmd-yellow-a-700,
