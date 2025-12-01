@@ -6,7 +6,9 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "lint": "eslint src --ext .js,.ts",
+    "format": "prettier --write \"src/**/*.{js,ts,json,md}\""
   },
   "dependencies": {
     "connect-pg-simple": "^10.0.0",
@@ -26,9 +28,14 @@
     "@types/connect-pg-simple": "^7.0.3",
     "@types/express-session": "^1.18.2",
     "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
     "connect-livereload": "^0.6.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
     "livereload": "^0.9.3",
     "nodemon": "^2.0.20",
+    "prettier": "^3.7.3",
     "typescript": "^5.9.3"
   }
 }
