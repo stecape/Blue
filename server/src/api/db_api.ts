@@ -94,8 +94,8 @@ export default function (app: Application, pool: Pool) {
   app.post(
     '/api/getAll',
     isAuthenticated,
-    (req: Request<GetAllRequest>, res: Response<GetAllResponse | ErrorResponse>) => {
-      const queryString = `SELECT ${req.body.fields.join(',')} FROM "${req.body.table}" ORDER BY id ASC`;
+    (req: Request<GetAllRequest>, res: Response<GetAllResponse<any> | ErrorResponse>) => {
+      const queryString = `SELECT * FROM "${req.body.table}" ORDER BY id ASC`;
       pool
         .query(queryString)
         .then((data) =>

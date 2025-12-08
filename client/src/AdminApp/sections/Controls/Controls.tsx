@@ -2,13 +2,18 @@ import { useContext } from 'react';
 import { Grid, GridCell } from '@react-md/utils';
 import gridStyles from '../../styles/Grid.module.scss';
 import { ctxData } from '../../Helpers/CtxProvider';
-import LogicSelection from '../../HMI/Components/LogicSelection/LogicSelection';
 import Set from '../../HMI/Components/Set/Set';
 import Act from '../../HMI/Components/Act/Act';
 import SetAct from '../../HMI/Components/SetAct/SetAct';
 
 function Controls() {
   const ctx = useContext(ctxData);
+
+  // If context is not available, render a loading state
+  if (!ctx) {
+    return <div>Loading...</div>;
+  }
+
   const pot = ctx.controls ? ctx.controls.Pot001 : null;
   return (
     <>

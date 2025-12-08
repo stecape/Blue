@@ -1,5 +1,6 @@
 import { PoolClient, Notification } from 'pg';
 import globalEventEmitter from '../Helpers/globalEventEmitter'; // Import globalEventEmitter
+import { DBNotifyPayload } from 'shared/types';
 
 export default function (client: PoolClient) {
   return new Promise((innerResolve, innerReject) => {
@@ -19,7 +20,7 @@ export default function (client: PoolClient) {
     // Listen for all pg_notify channel messages and loggin them
     client.on('notification', function (msg: Notification) {
       if (msg.payload) {
-        let payload = JSON.parse(msg.payload);
+        let payload: DBNotifyPayload = JSON.parse(msg.payload);
         //console.log(payload);
         globalEventEmitter.emit('update', payload);
       }

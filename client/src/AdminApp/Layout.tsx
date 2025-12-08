@@ -23,12 +23,12 @@ import './styles/Layout.scss';
 
 import Content from './Content';
 const appBar = (
-  pathname,
-  backendConnected,
-  dbConnected,
-  mqttConnected,
-  user,
-  logout,
+  pathname: string,
+  backendConnected: boolean,
+  dbConnected: boolean,
+  mqttConnected: boolean,
+  user: any,
+  logout: () => void,
 ) => {
   return (
     <LayoutAppBar theme="primary">
@@ -93,9 +93,9 @@ export default function MyLayout() {
     <Layout
       appBar={appBar(
         pathname,
-        ctx.backendStatus.backendConnected,
-        ctx.backendStatus.dbConnected,
-        ctx.backendStatus.mqttConnected,
+        ctx?.backendStatus?.backendConnected ?? false,
+        ctx?.backendStatus?.dbConnected ?? false,
+        ctx?.backendStatus?.mqttConnected ?? false,
         user,
         logout,
       )}

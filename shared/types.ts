@@ -20,6 +20,8 @@ export interface ErrorResponse {
   message: string;
 }
 
+export type BackendStatus = BackendStatusResult & { backendConnected: boolean };
+
 export interface BackendStatusResult {
   dbConnected: boolean;
   mqttConnected: boolean;
@@ -28,6 +30,13 @@ export interface BackendStatusResult {
 export interface BackendStatusResponse {
   result: BackendStatusResult;
   message: string;
+}
+
+// Notifica DB/WS: payload ricevuto da PG_NOTIFY e inoltrato via WebSocket
+export interface DBNotifyPayload {
+  table: string; // nome tabella coinvolta
+  operation: 'INSERT' | 'UPDATE' | 'DELETE' | 'TRUNCATE'; // tipo di operazione
+  data: any; // dati associati all'operazione (puoi tipizzare meglio se noto)
 }
 
 //DB
@@ -43,11 +52,10 @@ export interface ExecResponse {
 
 export interface GetAllRequest {
   table: string;
-  fields: string[];
 }
 
-export interface GetAllResponse {
-  result: any[];
+export interface GetAllResponse<T> {
+  result: T[];
   message: string;
 }
 
@@ -58,6 +66,7 @@ export interface DBDevice {
   name: string;
   user_id: number;
   template: number;
+  utc_offset?: number;
 }
 
 export interface AddDeviceRequest {
@@ -461,3 +470,31 @@ export interface AlarmsAckResponse {
   result: any;
   message: string;
 }
+
+//Admin App Context
+export type AdminContext = {
+  init: boolean;
+  setInit: (v: boolean) => void;
+  backendStatus: BackendStatus;
+  setBackendStatus: (v: BackendStatus) => void;
+  types: DBType[];
+  setTypes: (v: DBType[]) => void;
+  fields: DBField[];
+  setFields: (v: DBField[]) => void;
+  ums: DBUm[];
+  setUms: (v: DBUm[]) => void;
+  logicStates: DBLogicState[];
+  setLogicStates: (v: DBLogicState[]) => void;
+  vars: DBVar[];
+  setVars: (v: DBVar[]) => void;
+  tags: DBTag[];
+  setTags: (v: DBTag[]) => void;
+  users: DBUser[];
+  setUsers: (v: DBUser[]) => void;
+  devices: DBDevice[];
+  setDevices: (v: DBDevice[]) => void;
+  templates: DBTemplate[];
+  setTemplates: (v: DBTemplate[]) => void;
+  controls: GetAllControlsResult; // Sostituisci con il tipo corretto se noto
+  setControls: (v: GetAllControlsResult) => void; // Sostituisci con il tipo corretto se noto
+};

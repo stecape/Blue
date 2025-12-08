@@ -13,35 +13,61 @@ import { CheckCircleSVGIcon } from '@react-md/material-icons';
 import { ctxData } from '../../Helpers/CtxProvider';
 import tableStyles from '../../styles/Table.module.scss';
 import axios from 'axios';
+import { AdminContext, DBTag } from 'shared/types';
+
+type AlarmRow = {
+  Device: string;
+  Name: string;
+  Description: string;
+  Reaction: string;
+  Status: string;
+  Ts: string;
+};
+
+type DeviceAlarms = {
+  device: string;
+  alarms: AlarmRow[];
+};
 
 function AlarmsList() {
   // Usa la variabile d'ambiente per configurare l'URL del server
   const serverIp = getApiUrl();
   const ctx = useContext(ctxData);
+  
+  // Se il contesto non è disponibile, non renderizzare nulla
+  if (!ctx) return <></>;
+  
   // Recupero gli ID dei tipi e dei campi necessari
-  let alarmTypeId = ctx.types.find((t) => t.name === 'Alarm')?.id || 0;
-  let alarmStatusFieldId =
+  let alarmTypeId: number = ctx.types.find((t) => t.name === 'Alarm')?.id || 0;
+  let alarmStatusFieldId: number =
     ctx.fields.find((t) => t.parent_type === alarmTypeId && t.name === 'Status')
       ?.id || 0;
-  let alarmReactionFieldId =
+  let alarmReactionFieldId: number =
     ctx.fields.find(
       (t) => t.parent_type === alarmTypeId && t.name === 'Reaction',
     )?.id || 0;
-  let alarmTsFieldId =
+  let alarmTsFieldId: number =
     ctx.fields.find((t) => t.parent_type === alarmTypeId && t.name === 'Ts')
       ?.id || 0;
 
   // Semplificare il controllo utilizzando direttamente tag.type === alarmTypeId
-  let alarms = ctx.devices.map((device) => {
+  let alarms: DeviceAlarms[] = ctx.devices.map((device) => {
     // filtro le tag di tipo Alarm del dispositivo corrente, che siano type_field o vars
-    let alarmTags = getDeviceAlarms(device.id, ctx, alarmTypeId);
-    let deviceAlarms = alarmTags.map((al) => {
-      let alarm = {};
-      let alarmSubTags = ctx.tags.filter((t) => t.parent_tag === al.id);
+    let alarmTags: DBTag[] = getDeviceAlarms(device.id, ctx, alarmTypeId);
+    let deviceAlarms: AlarmRow[] = alarmTags.map((al) => {
+      let alarm: AlarmRow = {
+        Device: '',
+        Name: '',
+        Description: '',
+        Reaction: '',
+        Status: '',
+        Ts: ''
+      };
+      let alarmSubTags: DBTag[] = ctx.tags.filter((t) => t.parent_tag === al.id);
 
       alarm.Device = device.name;
       alarm.Name = al.name;
-      alarm.Description = al.comment;
+      alarm.Description = al.comment || '';
       alarm.Reaction =
         alarmSubTags.find((t) => t.type_field === alarmReactionFieldId)?.value
           ?.value ?? '';
@@ -86,13 +112,13 @@ function AlarmsList() {
           <TableBody>
             {alarms.map(({ device, alarms }) =>
               alarms
-                .filter((alarm) => alarm.Status) // Filtra gli allarmi con Status diverso da 0, "" o null
-                .sort((a, b) => {
+                .filter((alarm: AlarmRow) => alarm.Status) // Filtra gli allarmi con Status diverso da 0, "" o null
+                .sort((a: AlarmRow, b: AlarmRow) => {
                   const dateA = new Date(a.Ts).getTime();
                   const dateB = new Date(b.Ts).getTime();
                   return dateB - dateA; // Ordina in ordine decrescente
                 })
-                .map((alarm) => {
+                .map((alarm: AlarmRow) => {
                   return (
                     <TableRow key={`${device}-${alarm.Name}`}>
                       <TableCell className={tableStyles.cell} hAlign="left">
@@ -138,11 +164,15 @@ export default AlarmsList;
  * @param {string|number} alarmTypeNameOrId - Nome o id del type che identifica un Alarm (default: 'Alarm')
  * @returns {Array} Array di oggetti tag che sono allarmi
  */
-function getDeviceAlarms(deviceId, ctx, alarmTypeNameOrId = 'Alarm') {
+function getDeviceAlarms(
+  deviceId: number,
+  ctx: AdminContext,
+  alarmTypeNameOrId: string | number = 'Alarm'
+): DBTag[] {
   if (!ctx?.tags || !ctx?.vars || !ctx?.fields || !ctx?.types) return [];
   return ctx.tags.filter((tag) => {
     if (tag.device !== deviceId) return false;
-    let typeId = null;
+    let typeId: number | undefined;
     if (tag.type_field !== null && tag.type_field !== undefined) {
       // Aggregato: risali al field
       const field = ctx.fields.find((f) => f.id === tag.type_field);
@@ -153,7 +183,7 @@ function getDeviceAlarms(deviceId, ctx, alarmTypeNameOrId = 'Alarm') {
       typeId = parentVar?.type;
     }
     if (!typeId) return false;
-    const typeObj = ctx.types.find((t) => t.id === typeId || t.name === typeId);
+    const typeObj = ctx.types.find((t) => t.id === typeId); // || t.name === typeId);
     if (!typeObj) return false;
     return (
       typeObj.name === alarmTypeNameOrId || typeObj.id === alarmTypeNameOrId

@@ -9,6 +9,7 @@ import {
   PeopleFontIcon,
 } from '@react-md/material-icons';
 import { ReactComponent as TrendSVGIcon } from './sections/Trend/Trend.svg';
+import { ReactNode } from 'react';
 
 /**
  * Note: The `parentId` **must** be defaulted to `null` for the navigation tree
@@ -16,7 +17,29 @@ import { ReactComponent as TrendSVGIcon } from './sections/Trend/Trend.svg';
  * scenes. Each item that has a `parentId` set to `null` will appear at the root
  * level of your navigation tree.
  */
-function createRoute(pathname, children, leftAddon, parentId = null) {
+interface NavItem {
+  itemId: string;
+  parentId: string | null;
+  to: string;
+  children: ReactNode;
+  leftAddon: ReactNode;
+}
+
+interface CreateRouteFn {
+  (
+    pathname: string,
+    children: ReactNode,
+    leftAddon: ReactNode,
+    parentId?: string | null
+  ): NavItem;
+}
+
+const createRoute: CreateRouteFn = (
+  pathname,
+  children,
+  leftAddon,
+  parentId = null
+) => {
   return {
     itemId: pathname,
     parentId,
@@ -24,7 +47,7 @@ function createRoute(pathname, children, leftAddon, parentId = null) {
     children,
     leftAddon,
   };
-}
+};
 
 const navItems = {
   '/': createRoute('/', 'Home', <HomeFontIcon />),

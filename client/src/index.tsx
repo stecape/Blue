@@ -9,7 +9,7 @@ import './AdminApp/styles/index.scss';
 // Configurazione globale di axios per inviare i cookie in tutte le richieste
 axios.defaults.withCredentials = true;
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById('root') as HTMLElement;
 const root = createRoot(rootElement);
 
 root.render(

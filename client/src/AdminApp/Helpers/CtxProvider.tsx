@@ -9,230 +9,89 @@ import { useAddMessage } from '@react-md/alert';
 import { SocketContext } from './socket';
 import axios from 'axios';
 import { getApiUrl } from './config';
+import { DBType, DBField, DBVar, DBUser, DBDevice, DBLogicState, DBTag, DBTemplate, DBUm, GetAllResponse, BackendStatus, BackendStatusResponse, GetAllControlsResult, GetAllControlsResponse, AdminContext, DBNotifyPayload } from 'shared/types';
 
 // Usa la variabile d'ambiente per configurare l'URL del server
 
-export const ctxData = createContext();
+export const ctxData = createContext<AdminContext | null>(null);
 
-export const CtxProvider = ({ children }) => {
+export const CtxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const serverIp = getApiUrl();
   const addMessage = useAddMessage();
   const socket = useContext(SocketContext);
-  const [types, setTypes] = useState([]);
-  const [fields, setFields] = useState([]);
-  const [ums, setUms] = useState([]);
-  const [logicStates, setLogicStates] = useState([]);
-  const [vars, setVars] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [backendStatus, setBackendStatus] = useState({
-    backendConnected: socket.connected,
+  const [types, setTypes] = useState<DBType[]>([]);
+  const [fields, setFields] = useState<DBField[]>([]);
+  const [ums, setUms] = useState<DBUm[]>([]);
+  const [logicStates, setLogicStates] = useState<DBLogicState[]>([]);
+  const [vars, setVars] = useState<DBVar[]>([]);
+  const [tags, setTags] = useState<DBTag[]>([]);
+  const [backendStatus, setBackendStatus] = useState<BackendStatus>({
+    backendConnected: socket !== null && socket.connected,
     dbConnected: false,
     mqttConnected: false,
   });
   const [init, setInit] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [devices, setDevices] = useState([]);
-  const [templates, setTemplates] = useState([]);
-  const [controls, setControls] = useState([]); //array di oggetti. Ogni oggetto conterrà le tagId appartenenti ad un certo data type
+  const [users, setUsers] = useState<DBUser[]>([]);
+  const [devices, setDevices] = useState<DBDevice[]>([]);
+  const [templates, setTemplates] = useState<DBTemplate[]>([]);
+  const [controls, setControls] = useState<GetAllControlsResult>({}); //array di oggetti. Ogni oggetto conterrà le tagId appartenenti ad un certo data type
   useEffect(() => {
     const getAllControls = async () => {
       try {
-        const response = await axios.post(`${serverIp}/api/getAllControls`);
-        setControls(response.data.result);
-        addMessage({ children: response.data.message });
+        const response: GetAllControlsResponse = await axios.post(`${serverIp}/api/getAllControls`);
+        setControls(response.result);
+        addMessage({ children: response.message });
       } catch (error) {
         console.log(error);
       }
     };
 
     const retrieveData = async () => {
-      if (socket.connected) {
+      if (socket !== null && socket.connected) {
         try {
-          console.log('trying to retrieve data');
           const requests = [
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'Type',
-              fields: ['name', 'id', 'base_type', 'locked'],
-            }),
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'Field',
-              fields: [
-                'id',
-                'name',
-                'type',
-                'parent_type',
-                'um',
-                'logic_state',
-                'comment',
-                'fixed_id',
-              ],
-            }),
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'um',
-              fields: ['id', 'name', 'metric', 'imperial', 'gain', '"offset"'],
-            }),
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'LogicState',
-              fields: ['id', 'name', 'value'],
-            }),
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'Var',
-              fields: [
-                'id',
-                'name',
-                'template',
-                'type',
-                'um',
-                'logic_state',
-                'comment',
-                'fixed_id',
-              ],
-            }),
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'Tag',
-              fields: [
-                'id',
-                'name',
-                'device',
-                'var',
-                'parent_tag',
-                'type_field',
-                'um',
-                'logic_state',
-                'comment',
-                'value',
-                'fixed_id',
-              ],
-            }),
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'User',
-              fields: ['id', 'name', 'email', 'role'],
-            }),
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'Device',
-              fields: [
-                'id',
-                'name',
-                'user_id',
-                'template',
-                'status',
-                'utc_offset',
-              ],
-            }),
-            axios.post(`${serverIp}/api/getAll`, {
-              table: 'Template',
-              fields: ['id', 'name'],
-            }),
-            axios.post(`${serverIp}/api/getAllControls`),
-            axios.post(`${serverIp}/api/getBackendStatus`),
-          ];
-
+            axios.post<GetAllResponse<DBType>>(`${serverIp}/api/getAll`, { table: 'Type' }),
+            axios.post<GetAllResponse<DBField>>(`${serverIp}/api/getAll`, { table: 'Field' }),
+            axios.post<GetAllResponse<DBUm>>(`${serverIp}/api/getAll`, { table: 'um' }),
+            axios.post<GetAllResponse<DBLogicState>>(`${serverIp}/api/getAll`, { table: 'LogicState' }),
+            axios.post<GetAllResponse<DBVar>>(`${serverIp}/api/getAll`, { table: 'Var' }),
+            axios.post<GetAllResponse<DBTag>>(`${serverIp}/api/getAll`, { table: 'Tag' }),
+            axios.post<GetAllResponse<DBUser>>(`${serverIp}/api/getAll`, { table: 'User' }),
+            axios.post<GetAllResponse<DBDevice>>(`${serverIp}/api/getAll`, { table: 'Device' }),
+            axios.post<GetAllResponse<DBTemplate>>(`${serverIp}/api/getAll`, { table: 'Template' }),
+            axios.post<GetAllControlsResponse>(`${serverIp}/api/getAllControls`),
+            axios.post<BackendStatusResponse>(`${serverIp}/api/getBackendStatus`),
+          ] as const; // Utilizziamo 'as const' per dire a TypeScript che questo array è una tupla di richieste con tipi precisi e ordine fisso.
+                      // In questo modo, quando usiamo Promise.all, TypeScript saprà associare a ciascun elemento dell'array di risposte il tipo corretto.
+                      // Senza 'as const', TypeScript considererebbe l'array come AxiosPromise<any>[], perdendo la corrispondenza tra indice e tipo di risposta.
+          
           const responses = await Promise.all(requests);
 
-          setTypes(
-            responses[0].data.result.map((val) => ({
-              name: val[0],
-              id: val[1],
-              base_type: val[2],
-              locked: val[3],
-            })),
-          );
+          setTypes(responses[0].data.result);
           addMessage({ children: responses[0].data.message });
 
-          setFields(
-            responses[1].data.result.map((val) => ({
-              id: val[0],
-              name: val[1],
-              type: val[2],
-              parent_type: val[3],
-              um: val[4],
-              logic_state: val[5],
-              comment: val[6],
-              fixed_id: val[7] !== null ? Number(val[7]) : null,
-            })),
-          );
+          setFields(responses[1].data.result);
           addMessage({ children: responses[1].data.message });
 
-          setUms(
-            responses[2].data.result.map((val) => ({
-              id: val[0],
-              name: val[1],
-              metric: val[2],
-              imperial: val[3],
-              gain: val[4],
-              offset: val[5],
-            })),
-          );
+          setUms(responses[2].data.result);
           addMessage({ children: responses[2].data.message });
 
-          setLogicStates(
-            responses[3].data.result.map((val) => ({
-              id: val[0],
-              name: val[1],
-              value: val[2],
-            })),
-          );
+          setLogicStates(responses[3].data.result);
           addMessage({ children: responses[3].data.message });
 
-          setVars(
-            responses[4].data.result.map((val) => ({
-              id: val[0],
-              name: val[1],
-              template: val[2],
-              type: val[3],
-              um: val[4],
-              logic_state: val[5],
-              comment: val[6],
-              fixed_id: val[7] !== null ? Number(val[7]) : null,
-            })),
-          );
+          setVars(responses[4].data.result);
           addMessage({ children: responses[4].data.message });
 
-          setTags(
-            responses[5].data.result.map((val) => ({
-              id: val[0],
-              name: val[1],
-              device: val[2],
-              var: val[3],
-              parent_tag: val[4],
-              type_field: val[5],
-              um: val[6],
-              logic_state: val[7],
-              comment: val[8],
-              value: val[9],
-              fixed_id: val[10] !== null ? Number(val[10]) : null,
-            })),
-          );
+          setTags(responses[5].data.result);
           addMessage({ children: responses[5].data.message });
 
-          setUsers(
-            responses[6].data.result.map((val) => ({
-              id: val[0],
-              name: val[1],
-              email: val[2],
-              role: val[3],
-            })),
-          );
+          setUsers(responses[6].data.result);
           addMessage({ children: responses[6].data.message });
 
-          setDevices(
-            responses[7].data.result.map((val) => ({
-              id: val[0],
-              name: val[1],
-              user_id: val[2],
-              template: val[3],
-              status: val[4],
-              utc_offset: val[5],
-            })),
-          );
+          setDevices(responses[7].data.result);
           addMessage({ children: responses[7].data.message });
 
-          setTemplates(
-            responses[8].data.result.map((val) => ({
-              id: val[0],
-              name: val[1],
-            })),
-          );
+          setTemplates(responses[8].data.result);
           addMessage({ children: responses[8].data.message });
 
           setControls(responses[9].data.result);
@@ -261,29 +120,28 @@ export const CtxProvider = ({ children }) => {
       console.log('socket connected');
       setBackendStatus((prevStatus) => ({
         ...prevStatus,
-        backendConnected: socket.connected,
+        backendConnected: socket !== null && socket.connected,
       }));
       retrieveData();
     };
 
-    const on_error = (...args) => {
-      console.log('socket error:', args[0]);
+    const on_error = (err: Error) => {
+      console.log('socket error:', err);
       setBackendStatus((prevStatus) => ({
         ...prevStatus,
-        backendConnected: socket.connected,
+        backendConnected: socket !== null && socket.connected,
       }));
     };
 
-    const on_connect_error = (...args) => {
-      console.log('socket connect error:', args[0]);
+    const on_connect_error = (err: Error) => {
+      console.log('socket connect error:', err);
       setBackendStatus((prevStatus) => ({
         ...prevStatus,
-        backendConnected: socket.connected,
+        backendConnected: socket !== null && socket.connected,
       }));
     };
 
-    const on_update = async (...args) => {
-      const value = args[0];
+    const on_update = async (value: DBNotifyPayload) => {
 
       switch (value.table) {
         //Type
@@ -569,11 +427,11 @@ export const CtxProvider = ({ children }) => {
       }
     };
 
-    const on_close = (...args) => {
-      console.log('socket closed:', args[0]);
+    const on_close = (err: Error) => {
+      console.log('socket closed:', err);
       setBackendStatus((prevStatus) => ({
         ...prevStatus,
-        backendConnected: socket.connected,
+        backendConnected: socket !== null && socket.connected,
       }));
     };
 
@@ -581,7 +439,7 @@ export const CtxProvider = ({ children }) => {
       console.log('Web Socket event received: dbConnected');
       setBackendStatus((prevStatus) => ({
         ...prevStatus,
-        backendConnected: socket.connected,
+        backendConnected: socket !== null && socket.connected,
         dbConnected: true,
       }));
       retrieveData();
@@ -591,7 +449,7 @@ export const CtxProvider = ({ children }) => {
       console.log('Web Socket event received: dbDisconnected');
       setBackendStatus((prevStatus) => ({
         ...prevStatus,
-        backendConnected: socket.connected,
+        backendConnected: socket !== null && socket.connected,
         dbConnected: false,
       }));
     };
@@ -600,7 +458,7 @@ export const CtxProvider = ({ children }) => {
       console.log('Web Socket event received: mqttConnected');
       setBackendStatus((prevStatus) => ({
         ...prevStatus,
-        backendConnected: socket.connected,
+        backendConnected: socket !== null && socket.connected,
         mqttConnected: true,
       }));
     };
@@ -609,7 +467,7 @@ export const CtxProvider = ({ children }) => {
       console.log('Web Socket event received: mqttDisconnected');
       setBackendStatus((prevStatus) => ({
         ...prevStatus,
-        backendConnected: socket.connected,
+        backendConnected: socket !== null && socket.connected,
         mqttConnected: false,
       }));
     };
@@ -620,43 +478,47 @@ export const CtxProvider = ({ children }) => {
     }
 
     //On (re)connection request the lists
-    socket.on('connect', on_connect);
+    if (socket) {
+      socket.on('connect', on_connect);
 
-    //Connect arror logging
-    socket.on('connect_error', on_connect_error);
+      //Connect arror logging
+      socket.on('connect_error', on_connect_error);
 
-    //Error logging
-    socket.on('error', on_error);
+      //Error logging
+      socket.on('error', on_error);
 
-    //on update
-    socket.on('update', on_update);
+      //on update
+      socket.on('update', on_update);
 
-    //on close
-    socket.on('close', on_close);
+      //on close
+      socket.on('close', on_close);
 
-    //on dbConnected
-    socket.on('dbConnected', on_db_connected);
+      //on dbConnected
+      socket.on('dbConnected', on_db_connected);
 
-    //on dbDisconnected
-    socket.on('dbDisconnected', on_db_disconnected);
+      //on dbDisconnected
+      socket.on('dbDisconnected', on_db_disconnected);
 
-    //on mqttConnected
-    socket.on('mqttConnected', on_mqtt_connected);
+      //on mqttConnected
+      socket.on('mqttConnected', on_mqtt_connected);
 
-    //on mqttDisconnected
-    socket.on('mqttDisconnected', on_mqtt_disconnected);
+      //on mqttDisconnected
+      socket.on('mqttDisconnected', on_mqtt_disconnected);
+    }
 
     //dismantling listeners
     return () => {
-      socket.off('connect', on_connect);
-      socket.off('connect_error', on_connect_error);
-      socket.off('error', on_error);
-      socket.off('update', on_update);
-      socket.off('close', on_close);
-      socket.off('dbConnected', on_db_connected);
-      socket.off('dbDisconnected', on_db_disconnected);
-      socket.off('mqttConnected', on_mqtt_connected);
-      socket.off('mqttDisconnected', on_mqtt_disconnected);
+      if (socket) {
+        socket.off('connect', on_connect);
+        socket.off('connect_error', on_connect_error);
+        socket.off('error', on_error);
+        socket.off('update', on_update);
+        socket.off('close', on_close);
+        socket.off('dbConnected', on_db_connected);
+        socket.off('dbDisconnected', on_db_disconnected);
+        socket.off('mqttConnected', on_mqtt_connected);
+        socket.off('mqttDisconnected', on_mqtt_disconnected);
+      }
     };
   }, [
     serverIp,
@@ -676,59 +538,47 @@ export const CtxProvider = ({ children }) => {
     controls,
   ]);
 
-  const value = useMemo(
+  const value: AdminContext = useMemo(
     () => ({
-      init,
-      setInit,
-      backendStatus,
-      setBackendStatus,
       types,
-      setTypes,
       fields,
-      setFields,
       ums,
-      setUms,
       logicStates,
-      setLogicStates,
       vars,
-      setVars,
       tags,
-      setTags,
       users,
-      setUsers,
       devices,
-      setDevices,
       templates,
-      setTemplates,
       controls,
+      backendStatus,
+      init,
+      setTypes,
+      setFields,
+      setUms,
+      setLogicStates,
+      setVars,
+      setTags,
+      setUsers,
+      setDevices,
+      setTemplates,
       setControls,
+      setBackendStatus,
+      setInit,
     }),
     [
-      init,
-      setInit,
-      backendStatus,
-      setBackendStatus,
       types,
-      setTypes,
       fields,
-      setFields,
       ums,
-      setUms,
       logicStates,
-      setLogicStates,
       vars,
-      setVars,
       tags,
-      setTags,
       users,
-      setUsers,
       devices,
-      setDevices,
       templates,
-      setTemplates,
       controls,
-      setControls,
-    ],
+      backendStatus,
+      init,
+    ]
   );
 
   return <ctxData.Provider value={value}>{children}</ctxData.Provider>;
